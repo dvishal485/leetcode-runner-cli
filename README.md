@@ -125,8 +125,7 @@ This is a generic module that can be used to run any language. It only needs a m
 Currently, the following languages are added by default :
 Rust, Python3, Cpp, Java, C, Javascript, Go, Kotlin, Swift, Typescript,
 
-More languages can be added manually as per requirement by [changing enum](https://github.com/dvishal485/leetcode-runner-cli/blob/main/src/codefile.rs#LL3)
- in the `src/codefile.rs` file.
+More languages can be added manually as per requirement by [changing enum](https://github.com/dvishal485/leetcode-runner-cli/blob/main/src/file_parser/language.rs) in the `src/file_parser/language.rs` file.
 
 ---
 

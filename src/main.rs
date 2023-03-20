@@ -1,10 +1,11 @@
 mod file_parser;
-mod leetcode;
+mod leetcode_api;
 use colored::Colorize;
+use leetcode_api::leetcode::LeetCode;
 use std::process::ExitCode;
 
 use crate::file_parser::codefile::CodeFile;
-use crate::leetcode::{ExecutionResult, LeetCode, SubmissionResult};
+use crate::leetcode_api::worker::{ExecutionResult, SubmissionResult};
 
 use clap::Parser;
 
@@ -47,7 +48,8 @@ fn main() -> ExitCode {
             metadata.unwrap().display();
             return ExitCode::SUCCESS;
         } else {
-            println!("Authentication Error : {}", metadata.unwrap_err());
+            let error = metadata.unwrap_err();
+            println!("Authentication Error : {}", error);
             return ExitCode::FAILURE;
         }
     }
