@@ -18,9 +18,15 @@ Executes leetcode testcases and submits your solution through CLI interface
     cargo install --path .
     ```
 
-1. Setup environment variable `LEETCODE_SESSION` with your leetcode session cookie.
+1. Setup environment variable `LC_COOKIE` with your leetcode session cookie.
 
    You can get your session cookie by logging in to leetcode and inspecting the cookie in your browser's developer tools.
+
+   Make sure to put your cookie in double quotes.
+
+   ```bash
+    export LC_COOKIE="csrftoken=abcdefgh;LEETCODE_SESSION=ijklmnopqrstuvwxyz;"
+    ```
 
 1. Execute the tool and verify your authentication
 

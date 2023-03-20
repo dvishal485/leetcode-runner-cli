@@ -30,7 +30,7 @@ struct Args {
 
 fn main() -> ExitCode {
     let args = Args::parse();
-    let key = "LEETCODE_SESSION";
+    let key = "LC_COOKIE";
     let Some(cookie) = std::env::var_os(key) else {
         println!("{} is not set in the environment.", key);
         return ExitCode::FAILURE;
