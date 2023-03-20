@@ -1,4 +1,6 @@
+#[derive(Default)]
 pub enum Language {
+    #[default]
     Rust,
     Python3,
     Cpp,

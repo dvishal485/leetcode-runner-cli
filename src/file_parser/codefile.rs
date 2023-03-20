@@ -1,11 +1,25 @@
-use std::{io::{Read, Write}, path::PathBuf};
 use super::language::*;
+use std::{
+    io::{Read, Write},
+    path::PathBuf,
+};
 
 pub struct CodeFile {
     pub language: Language,
     pub path: std::path::PathBuf,
     pub question_title: String,
     pub code: String,
+}
+
+impl Default for CodeFile {
+    fn default() -> Self {
+        Self {
+            language: Default::default(),
+            path: PathBuf::from("main.rs"),
+            question_title: Default::default(),
+            code: Default::default(),
+        }
+    }
 }
 
 impl CodeFile {
@@ -21,18 +35,13 @@ impl CodeFile {
             let Some(valid_file) = Self::is_valid_file(&path) else {continue};
             let file_name = valid_file.0;
             code_file = Some(valid_file.1);
-            
+
             if file_name.starts_with("main") {
                 break;
             }
         }
         let mut code_file = code_file.unwrap_or_else(|| {
-            let default_code_file = CodeFile {
-                language: Language::Rust,
-                path: std::path::PathBuf::from("main.rs"),
-                question_title: String::new(),
-                code: String::new(),
-            };
+            let default_code_file: CodeFile = Default::default();
             println!(
                 "No code file found. Creating a new file named {}",
                 default_code_file.path.display()
@@ -46,12 +55,13 @@ impl CodeFile {
         });
         let mut file = std::fs::File::open(&code_file.path).unwrap();
         let mut code = String::new();
-        file.read_to_string(&mut code).expect(&format!(
-            "Failed to read file {}",
-            code_file.path.display()
-        ));
-
-        let (question_title, parsed_code) = Self::parse_code(&code);
+        file.read_to_string(&mut code)
+            .expect(&format!("Failed to read file {}", code_file.path.display()));
+        let parsed_file = Self::parse_code(&code);
+        let Ok((question_title, parsed_code)) = parsed_file else{
+            eprintln!("{}", parsed_file.err().unwrap());
+            std::process::exit(1);
+        };
         code_file.question_title = question_title;
         code_file.code = parsed_code;
         code_file
@@ -61,24 +71,27 @@ impl CodeFile {
         let file_name = path.file_name().and_then(|filename| filename.to_str())?;
         let extension = path.extension().and_then(|ext| ext.to_str())?;
         let language = Language::from_str(extension)?;
-        
-        Some(
-            (file_name, CodeFile {
-                language, path: path.clone(), question_title: String::new(), code: String::new() 
-            })
-        )
+
+        Some((
+            file_name,
+            CodeFile {
+                language,
+                path: path.clone(),
+                question_title: String::new(),
+                code: String::new(),
+            },
+        ))
     }
 
-    fn parse_code(code: &str) -> (String, String) {
+    fn parse_code(code: &str) -> Result<(String, String), String> {
         let question_title: String;
         let parsed_code: String;
         let start = code
             .find("#LCSTART")
-            .map(|idx| idx + 
-                // This returning None means the user
-                // wants to submit a practically empty file,
-                // but hey we don't judge!
-                code[idx..].find('\n').unwrap_or(0))
+            .map(|idx| idx + code[idx..].find('\n').unwrap_or(0))
+            // This returning None means the user
+            // wants to submit a practically empty file,
+            // but hey we don't judge!
             .unwrap_or(0);
 
         let end = code.find("#LCEND").unwrap_or(code.len());
@@ -87,18 +100,17 @@ impl CodeFile {
             let problem = problem.split('/').skip(2).next().unwrap();
             question_title = problem.to_string();
         } else {
-            println!("No leetcode problem found in the code file. Please add the problem link in the code file using comments.");
-            // terminate with error
-            std::process::exit(1);
+            return Err("No leetcode problem found in the code file. Please add the problem link in the code file using comments.".to_string());
         }
         parsed_code = code[start..end].to_string();
 
-        (question_title, parsed_code)
+        Ok((question_title, parsed_code))
     }
 
     pub fn from_file(path: String) -> Self {
         let path = PathBuf::from(path);
-        let (_, mut valid_file) = Self::is_valid_file(&path).expect("Improper filename or the language is not supported");
+        let (_, mut valid_file) =
+            Self::is_valid_file(&path).expect("Improper filename or the language is not supported");
         let file = std::fs::File::open(&path);
         let Ok(mut file) = file else {
             eprintln!("Error while opening file {}", path.display());
@@ -107,7 +119,11 @@ impl CodeFile {
         let mut code = String::new();
         file.read_to_string(&mut code)
             .expect(&format!("Failed to read file {}", path.display()));
-        let (question_title, parsed_code) = Self::parse_code(&code);
+        let parsed_file = Self::parse_code(&code);
+        let Ok((question_title, parsed_code)) = parsed_file else{
+            eprintln!("{}", parsed_file.err().unwrap());
+            std::process::exit(1);
+        };
         valid_file.question_title = question_title;
         valid_file.code = parsed_code;
         valid_file
