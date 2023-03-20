@@ -373,9 +373,8 @@ impl Success {
                 "Testcase execution success".green().bold()
             } else {
                 format!(
-                    "Testcase {}/{} execution failed",
-                    self.total_correct + 1,
-                    self.total_testcases
+                    "Testcase {}/{} testcase passed",
+                    self.total_correct, self.total_testcases
                 )
                 .red()
                 .bold()

@@ -96,7 +96,7 @@ impl CodeFile {
             );
             let mut file =
                 std::fs::File::create(&file_to_return.path).expect("Error during file creation");
-            let two_sum_problem = b"struct Solution;\n\n// https://leetcode.com/problems/two-sum/ LCSTART\n\nimpl Solution {\n\tpub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {\n\n\t}\n} // LCEND\n";
+            let two_sum_problem = b"struct Solution;\n\n// https://leetcode.com/problems/two-sum/ #LCSTART\n\nimpl Solution {\n\tpub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {\n\n\t}\n} // #LCEND\nfn main() {}";
             file.write_all(two_sum_problem).expect("File write failed");
         }
         let mut file = std::fs::File::open(&file_to_return.path).unwrap();
@@ -113,7 +113,7 @@ impl CodeFile {
         let end = code.find("#LCEND").unwrap_or(code.len());
         if let Some(problem) = code.find("leetcode.com/problems/") {
             let problem = (&code[problem..]).split_whitespace().next().unwrap();
-            let problem = problem.split('/').last().unwrap();
+            let problem = problem.split('/').skip(2).next().unwrap();
             file_to_return.question_title = problem.to_string();
         } else {
             println!("No leetcode problem found in the code file. Please add the problem link in the code file using comments.");
