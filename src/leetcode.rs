@@ -1,4 +1,4 @@
-use crate::codefile::CodeFile;
+use crate::file_parser::codefile::CodeFile;
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
 
@@ -141,7 +141,6 @@ struct Variables {
     titleSlug: String,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct LimitExceeded {
     status_code: u8,

@@ -1,9 +1,9 @@
-mod codefile;
+mod file_parser;
 mod leetcode;
 use colored::Colorize;
 use std::process::ExitCode;
 
-use crate::codefile::CodeFile;
+use crate::file_parser::codefile::CodeFile;
 use crate::leetcode::{ExecutionResult, LeetCode, SubmissionResult};
 
 use clap::Parser;
