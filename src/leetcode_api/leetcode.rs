@@ -196,7 +196,7 @@ impl LeetCode<Authorized> {
             return Err("No boiler plate code available in supported language".to_string());
         };
         let mut input = String::new();
-        print!("Filename (main.{}) : ", &(boiler_code.extension()));
+        println!("Filename (main.{}) : ", &(boiler_code.extension()));
         std::io::stdin()
             .read_line(&mut input)
             .expect("Failed to read line");

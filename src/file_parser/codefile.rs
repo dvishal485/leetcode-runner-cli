@@ -95,8 +95,8 @@ impl CodeFile {
         Ok((question_title, parsed_code))
     }
 
-    pub fn from_file(path: String) -> Self {
-        let path = PathBuf::from(path);
+    pub fn from_file(path: &str) -> Self {
+        let path = PathBuf::from(&path);
         let (_, mut valid_file) =
             Self::is_valid_file(&path).expect("Improper filename or the language is not supported");
         let file = std::fs::File::open(&path);

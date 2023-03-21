@@ -42,23 +42,17 @@ Executes leetcode testcases and submits your solution through CLI interface
 leetcode-runner-cli [FLAGS] [OPTIONS <option>]
 ```
 
-### Flags
+### Commands
 
-| Flag            | Description                      |
-| :-------------- | :------------------------------- |
-| `-h, --help`    | Prints help information          |
-| `-V, --version` | Prints version information       |
-| `-a, --auth`    | Authenticate with leetcode       |
-| `-s, --submit`  | Submit your solution to leetcode |
-
-### Options
-
-| Option           | Description                    |
-| :--------------- | :----------------------------- |
-| `-f, --file`     | Path to your solution file     |
-| `-t, --testcase` | Testcase file to run           |
-| `-q, --question` | Question title to fetch        |
-| `-q daily`       | Fetch daily challenge question |
+| Commands         | Description                      | Arguments                                  |
+| :--------------- | :------------------------------- | :----------------------------------------- |
+| `-h, --help`     | Prints help information          |                                            |
+| `-V, --version`  | Prints version information       |                                            |
+| `-a, --auth`     | Authenticate with leetcode       |                                            |
+| `-d, daily`      | Fetch daily challenge question   |                                            |
+| `-r, run`        | Execute file with testcases      | [file_to_run:path] [testcases_file:path]   |
+| `-q, --question` | Question title to fetch          | [question_title:string]                    |
+| `-s, --submit`   | Submit your solution to leetcode | [file_to_run:path] [execute_testcase:bool] |
 
 ### File changes
 
@@ -100,19 +94,19 @@ Note : [File should have the link of question in the comments](#file-changes) fo
 - Run src/main.rs with default testcases for question [koko-eating-bananas](https://leetcode.com/problems/koko-eating-bananas/)
 
     ```bash
-    leetcode-runner-cli -f ./src/main.rs
+    leetcode-runner-cli -r ./src/main.rs
     ```
 
 - Run src/main.rs with custom testcase file
 
     ```bash
-    leetcode-runner-cli -f ./src/main.rs -t ./testcase.txt
+    leetcode-runner-cli -r ./src/main.rs -t ./testcase.txt
     ```
 
 - Submit src/main.rs to leetcode
 
     ```bash
-    leetcode-runner-cli -f ./src/main.rs -s
+    leetcode-runner-cli -s ./src/main.rs
     ```
 
     Note : This will first execute the default testcases and then submit the solution to leetcode only if the testcases pass as a preventive measure to avoid submitting wrong solution.
