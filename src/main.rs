@@ -152,6 +152,12 @@ fn main() -> ExitCode {
                 ExecutionResult::Success(result) => {
                     is_correct = result.is_correct();
                     result.display();
+                    if !is_correct {
+                        println!(
+                            "{}",
+                            "Testcases can be found in testcase.txt".yellow().italic()
+                        );
+                    }
                 }
                 ExecutionResult::LimitExceeded(limit_exceeded) => {
                     println!("{}", limit_exceeded.status_msg);

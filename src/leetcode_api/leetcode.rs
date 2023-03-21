@@ -171,6 +171,16 @@ impl LeetCode<Authorized> {
         let ques = self.question_metadata(&question_title)?;
         if data_input == "" {
             data_input = ques.exampleTestcaseList.join("\n");
+            // write this to testcase.txt
+            if let Ok(mut file) = std::fs::File::create("testcase.txt") {
+                if let Ok(_) = std::io::Write::write_all(&mut file, data_input.as_bytes()) {
+                    println!("Wrote default testcases to testcase.txt");
+                } else {
+                    println!("Failed to write default testcases to testcase.txt");
+                }
+            } else {
+                println!("Failed to create testcase.txt!");
+            }
         }
         let question_id = ques.questionId;
         self._execute(

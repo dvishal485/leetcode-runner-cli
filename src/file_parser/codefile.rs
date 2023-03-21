@@ -60,7 +60,7 @@ impl CodeFile {
         let parsed_file = Self::parse_code(&code);
         let Ok((question_title, parsed_code)) = parsed_file else{
             eprintln!("{}", parsed_file.err().unwrap());
-            std::process::exit(1);
+            panic!("Error parsing code file");
         };
         code_file.question_title = question_title;
         code_file.code = parsed_code;
@@ -114,7 +114,7 @@ impl CodeFile {
         let file = std::fs::File::open(&path);
         let Ok(mut file) = file else {
             eprintln!("Error while opening file {}", path.display());
-            std::process::exit(1);
+            panic!("Error while opening file");
         };
         let mut code = String::new();
         file.read_to_string(&mut code)
@@ -122,7 +122,7 @@ impl CodeFile {
         let parsed_file = Self::parse_code(&code);
         let Ok((question_title, parsed_code)) = parsed_file else{
             eprintln!("{}", parsed_file.err().unwrap());
-            std::process::exit(1);
+panic!("Error parsing code file");
         };
         valid_file.question_title = question_title;
         valid_file.code = parsed_code;
