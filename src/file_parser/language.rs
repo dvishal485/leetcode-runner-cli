@@ -11,6 +11,14 @@ pub enum Language {
     Kotlin,
     Swift,
     Typescript,
+    Csharp,
+    Ruby,
+    Scala,
+    PHP,
+    Racket,
+    Erlang,
+    Elixir,
+    Dart,
 }
 impl Language {
     pub fn from_str(input: &str) -> Option<Language> {
@@ -25,6 +33,14 @@ impl Language {
             "kt" => Some(Language::Kotlin),
             "swift" => Some(Language::Swift),
             "ts" => Some(Language::Typescript),
+            "cs" => Some(Language::Csharp),
+            "rb" => Some(Language::Ruby),
+            "scala" => Some(Language::Scala),
+            "php" => Some(Language::PHP),
+            "rkt" => Some(Language::Racket),
+            "erl" => Some(Language::Erlang),
+            "ex" => Some(Language::Elixir),
+            "dart" => Some(Language::Dart),
             _ => None,
         }
     }
@@ -40,6 +56,14 @@ impl Language {
             Language::Kotlin => "kotlin",
             Language::Swift => "swift",
             Language::Typescript => "typescript",
+            Language::Csharp => "csharp",
+            Language::Ruby => "ruby",
+            Language::Scala => "scala",
+            Language::PHP => "php",
+            Language::Racket => "racket",
+            Language::Erlang => "erlang",
+            Language::Elixir => "elixir",
+            Language::Dart => "dart",
         }
     }
     pub(crate) fn from_slug(input: &str) -> Option<Language> {
@@ -54,6 +78,14 @@ impl Language {
             "kotlin" => Some(Language::Kotlin),
             "swift" => Some(Language::Swift),
             "typescript" => Some(Language::Typescript),
+            "csharp" => Some(Language::Csharp),
+            "ruby" => Some(Language::Ruby),
+            "scala" => Some(Language::Scala),
+            "php" => Some(Language::PHP),
+            "racket" => Some(Language::Racket),
+            "erlang" => Some(Language::Erlang),
+            "elixir" => Some(Language::Elixir),
+            "dart" => Some(Language::Dart),
             _ => None,
         }
     }
@@ -69,6 +101,14 @@ impl Language {
             Language::Kotlin => "kt",
             Language::Swift => "swift",
             Language::Typescript => "ts",
+            Language::Csharp => "cs",
+            Language::Ruby => "rb",
+            Language::Scala => "scala",
+            Language::PHP => "php",
+            Language::Racket => "rkt",
+            Language::Erlang => "erl",
+            Language::Elixir => "ex",
+            Language::Dart => "dart",
         }
     }
     pub fn to_string(&self) -> String {

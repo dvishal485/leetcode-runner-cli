@@ -44,17 +44,17 @@ leetcode-runner-cli [FLAGS] [OPTIONS <option>]
 
 ### Commands
 
-| Commands           | Description                                         | Arguments                                       |
-| :----------------- | :-------------------------------------------------- | :---------------------------------------------- |
-| `-h, --help`       | Prints help information                             | -                                               |
-| `-V, --version`    | Prints version information                          | -                                               |
-| `-a, auth`         | Authenticate with leetcode                          | -                                               |
-| `-d, daily`        | Fetch daily challenge question                      | -                                               |
-| `-q, question`     | Question title to fetch                             | [question_title] : String                       |
-| `-r, run`          | Execute file with default testcases                 | [file_to_run] : String                          |
-| `-rt, run-custom`  | Execute file with custom testcases                  | [testcase_file] : String [file_to_run] : String |
-| `-s, submit`       | Submit solution to leetcode after passing testcases | [file_to_submit] : String                       |
-| `-fs, fast-submit` | Submit solution to leetcode                         | [file_to_submit] : String                       |
+| Commands           | Description                                         | Arguments                     |
+| :----------------- | :-------------------------------------------------- | :---------------------------- |
+| `-h, --help`       | Prints help information                             | -                             |
+| `-V, --version`    | Prints version information                          | -                             |
+| `-a, auth`         | Authenticate with leetcode                          | -                             |
+| `-d, daily`        | Fetch daily challenge question                      | -                             |
+| `-q, question`     | Question title to fetch                             | [question_title]              |
+| `-r, run`          | Execute file with default testcases                 | [file_to_run]                 |
+| `-rt, run-custom`  | Execute file with custom testcases                  | [testcase_file] [file_to_run] |
+| `-s, submit`       | Submit solution to leetcode after passing testcases | [file_to_submit]              |
+| `-fs, fast-submit` | Submit solution to leetcode                         | [file_to_submit]              |
 
 ### File changes
 
@@ -137,7 +137,7 @@ So, in the above examples, you can simply run the following commands :
 This is a generic module that can be used to run any language. It only needs a mapping to the `language` on leetcode and `extension` of the file.
 
 Currently, the following languages are added by default :
-Rust, Python3, Cpp, Java, C, Javascript, Go, Kotlin, Swift, Typescript.
+Rust, Python3, Cpp, Java, C, Javascript, Go, Kotlin, Swift, Typescript, Csharp, Ruby, Scala, PHP, Racket, Erlang, Elixir, Dart.
 
 More languages can be added manually as per requirement by [changing enum](https://github.com/dvishal485/leetcode-runner-cli/blob/main/src/file_parser/language.rs) in the `src/file_parser/language.rs` file.
 
