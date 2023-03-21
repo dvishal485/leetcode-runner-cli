@@ -1,13 +1,12 @@
-mod file_parser;
-mod leetcode_api;
-use colored::Colorize;
-use leetcode_api::leetcode::LeetCode;
-use std::process::ExitCode;
-
 use crate::file_parser::codefile::CodeFile;
 use crate::leetcode_api::worker::{ExecutionResult, SubmissionResult};
 
+mod file_parser;
+mod leetcode_api;
 use clap::Parser;
+use colored::Colorize;
+use leetcode_api::leetcode::LeetCode;
+use std::process::ExitCode;
 
 #[derive(Parser, Debug)]
 #[command(version)]
@@ -55,13 +54,31 @@ fn main() -> ExitCode {
     }
 
     if args.question != "" {
-        let question = lc.question_content(&args.question);
+        let title: String;
+        if args.question == "daily" {
+            let daily_challenge = lc.get_daily_challenge();
+            if daily_challenge.is_ok() {
+                let daily_challenge = daily_challenge.unwrap();
+                println!("Today's Daily Challenge :");
+                println!("{}", &daily_challenge);
+                title = daily_challenge.question.titleSlug;
+            } else {
+                eprintln!(
+                    "Error getting daily challenge : {}",
+                    daily_challenge.unwrap_err()
+                );
+                return ExitCode::FAILURE;
+            }
+        } else {
+            title = args.question.clone();
+        }
+        let question = lc.question_content(&title);
         if question.is_ok() {
             let question = question.unwrap();
             let filename = format!("{}.html", args.question);
             // save to filename
             if let Ok(_) = std::fs::write(&filename, question.content) {
-                println!("Saved question as HTML to {}", filename);
+                println!("Saved question as HTML to {}", filename.cyan());
                 return ExitCode::SUCCESS;
             } else {
                 println!("Error saving question as HTML");

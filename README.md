@@ -44,20 +44,21 @@ leetcode-runner-cli [FLAGS] [OPTIONS <option>]
 
 ### Flags
 
-| Flag            | Description                 |
-| :-------------- | :-------------------------- |
-| `-h, --help`    | Prints help information     |
-| `-V, --version` | Prints version information  |
-| `-a, --auth`    | Authenticate with leetcode  |
+| Flag            | Description                      |
+| :-------------- | :------------------------------- |
+| `-h, --help`    | Prints help information          |
+| `-V, --version` | Prints version information       |
+| `-a, --auth`    | Authenticate with leetcode       |
 | `-s, --submit`  | Submit your solution to leetcode |
 
 ### Options
 
-| Option           | Description                 |
-| :--------------- | :-------------------------- |
-| `-f, --file`     | Path to your solution file  |
-| `-t, --testcase` | Testcase file to run        |
-| `-q, --question` | Question title to fetch     |
+| Option           | Description                    |
+| :--------------- | :----------------------------- |
+| `-f, --file`     | Path to your solution file     |
+| `-t, --testcase` | Testcase file to run           |
+| `-q, --question` | Question title to fetch        |
+| `-q daily`       | Fetch daily challenge question |
 
 ### File changes
 
