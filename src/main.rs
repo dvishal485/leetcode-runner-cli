@@ -84,6 +84,9 @@ fn main() -> ExitCode {
                 println!("Error saving question as HTML");
                 return ExitCode::FAILURE;
             }
+        } else {
+            eprintln!("Error getting question content : {}", question.unwrap_err());
+            return ExitCode::FAILURE;
         };
     }
 

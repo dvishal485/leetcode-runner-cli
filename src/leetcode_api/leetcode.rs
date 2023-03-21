@@ -115,6 +115,7 @@ impl LeetCode<Authorized> {
    query:  "query questionContent($titleSlug: String!) { question(titleSlug: $titleSlug) { content mysqlSchemas }}".to_string(),
    variables: serde_json::to_string(&Variables { titleSlug: title_slug.to_string() }).unwrap(),
   };
+
         let Ok(data) = client.post(url).json(&query).send() else {
  return Err("Failed to fetch question id from leetcode".to_string());
    };
@@ -127,6 +128,85 @@ impl LeetCode<Authorized> {
         struct Data {
             data: QuestionWrapper,
         }
+
+        let query = "\n query questionEditorData($titleSlug: String!) {\n  question(titleSlug: $titleSlug) {\n questionId\n questionFrontendId\n codeSnippets {\n   lang\n   langSlug\n   code\n }\n envInfo\n enableRunCode\n  }\n}\n ";
+        let varibales = serde_json::to_string(&Variables {
+            titleSlug: title_slug.to_string(),
+        })
+        .unwrap();
+        let Ok(boiler_code) = client
+            .post(url)
+            .json(&GraphqlRequest {
+                query: query.to_string(),
+                variables: varibales,
+            })
+            .send() else {
+            return Err("Failed to fetch boiler plate code!".to_string());
+            };
+
+        #[derive(Debug, Deserialize)]
+        #[allow(non_snake_case)]
+        struct CodeSnippets {
+            codeSnippets: Vec<BoilerPlateCode>,
+        }
+        #[derive(Debug, Deserialize)]
+        struct WrapperData {
+            question: CodeSnippets,
+        }
+        #[derive(Debug, Deserialize)]
+        struct Wrapper {
+            data: WrapperData,
+        }
+
+        let boiler_code_vector = boiler_code
+            .json::<Wrapper>()
+            .map_err(|_| "Failed to parse boiler plate code!".to_string())?
+            .data
+            .question
+            .codeSnippets;
+
+        let boiler_code_vector = boiler_code_vector
+            .into_iter()
+            .filter(|code| code.is_supported())
+            .collect::<Vec<_>>();
+
+        // ask user to specify language among these options without using external lib
+        let boiler_code = if boiler_code_vector.len() == 1 {
+            boiler_code_vector.into_iter().next().unwrap()
+        } else if !boiler_code_vector.is_empty() {
+            let mut input = String::new();
+            println!("\nPlease select a language from the following options :");
+            for (i, code) in boiler_code_vector.iter().enumerate() {
+                println!("{}: {}", i, code.langSlug);
+            }
+            println!(
+                "\nFor example : Input \"{}\" for {}",
+                0, &boiler_code_vector[0].langSlug
+            );
+            std::io::stdin()
+                .read_line(&mut input)
+                .expect("Failed to read line");
+            let input = input.trim();
+            let input = input.parse::<usize>().expect("Failed to parse input");
+            boiler_code_vector
+                .into_iter()
+                .nth(input)
+                .expect("Invalid input")
+        } else {
+            return Err("No boiler plate code available in supported language".to_string());
+        };
+        let mut input = String::new();
+        print!("Filename (main.{}) : ", &(boiler_code.extension()));
+        std::io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read line");
+        let input = input.trim();
+        let filename = if input.is_empty() {
+            format!("main.{}", boiler_code.extension())
+        } else {
+            input.to_string()
+        };
+        boiler_code.save_code(&filename);
 
         data.json::<Data>()
             .map_err(|_| "Failed to parse question content".to_string())

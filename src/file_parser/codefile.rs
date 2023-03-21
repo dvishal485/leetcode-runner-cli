@@ -1,8 +1,5 @@
 use super::language::*;
-use std::{
-    io::{Read, Write},
-    path::PathBuf,
-};
+use std::{io::Read, path::PathBuf};
 
 pub struct CodeFile {
     pub language: Language,
@@ -41,17 +38,8 @@ impl CodeFile {
             }
         }
         let mut code_file = code_file.unwrap_or_else(|| {
-            let default_code_file: CodeFile = Default::default();
-            println!(
-                "No code file found. Creating a new file named {}",
-                default_code_file.path.display()
-            );
-            let mut file =
-                std::fs::File::create(&default_code_file.path).expect("Error during file creation");
-            let two_sum_problem = b"struct Solution;\n\n// https://leetcode.com/problems/two-sum/ #LCSTART\n\nimpl Solution {\n\tpub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {\n\n\t}\n} // #LCEND\nfn main() {}";
-            file.write_all(two_sum_problem).expect("File write failed");
-
-            default_code_file
+            eprintln!("No code file found. Try creating a file named with proper extension",);
+            panic!("No code file found");
         });
         let mut file = std::fs::File::open(&code_file.path).unwrap();
         let mut code = String::new();

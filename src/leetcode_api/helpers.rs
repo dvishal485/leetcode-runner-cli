@@ -55,6 +55,58 @@ pub enum Difficulty {
     Hard,
 }
 
+#[derive(Debug, Deserialize)]
+#[allow(non_snake_case)]
+pub struct DailyChallenge {
+    pub date: String,
+    pub userStatus: String,
+    pub link: String,
+    pub question: DailyChallengeQuestion,
+}
+
+#[derive(Debug, Deserialize)]
+#[allow(non_snake_case)]
+pub struct BoilerPlateCode {
+    pub(crate) code: String,
+    pub(crate) langSlug: String,
+}
+
+use super::super::file_parser::language::Language;
+impl BoilerPlateCode {
+    pub(crate) fn save_code(&self, filename: &str) {
+        let mut file = std::fs::File::create(filename).expect("Error: Unable to create file");
+        // write code into file
+        std::io::Write::write_all(&mut file, self.code.as_bytes())
+            .expect("Error: Unable to write to file");
+    }
+    pub(crate) fn is_supported(&self) -> bool {
+        let language = Language::from_slug(&self.langSlug);
+        if let Some(_) = language {
+            true
+        } else {
+            false
+        }
+    }
+    pub(crate) fn extension(&self) -> String {
+        let language = Language::from_slug(&self.langSlug).unwrap();
+        language.extension().to_owned()
+    }
+}
+
+impl std::fmt::Display for DailyChallenge {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Title      : {}\nDifficulty : {}\nDate       : {}\nStatus     : {}\nAC Rate    : {:.2}%",
+            self.question.title.bright_cyan(),
+            Difficulty::from_str(&self.question.difficulty),
+            self.date,
+            self.userStatus,
+            self.question.acRate
+        )
+    }
+}
+
 impl std::fmt::Display for Difficulty {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -73,28 +125,5 @@ impl Difficulty {
             "Hard" => Difficulty::Hard,
             _ => panic!("Invalid difficulty"),
         }
-    }
-}
-
-#[derive(Debug, Deserialize)]
-#[allow(non_snake_case)]
-pub struct DailyChallenge {
-    pub date: String,
-    pub userStatus: String,
-    pub link: String,
-    pub question: DailyChallengeQuestion,
-}
-
-impl std::fmt::Display for DailyChallenge {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Title      : {}\nDifficulty : {}\nDate       : {}\nStatus     : {}\nAC Rate    : {:.2}%",
-            self.question.title.bright_cyan(),
-            Difficulty::from_str(&self.question.difficulty),
-            self.date,
-            self.userStatus,
-            self.question.acRate
-        )
     }
 }
