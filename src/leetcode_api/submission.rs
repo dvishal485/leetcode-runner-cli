@@ -137,12 +137,14 @@ impl std::fmt::Display for SubmitWrong {
         let seperator = "-------------------------------";
         write!(
             f,
-            "\n{seperator}\n{}\n{seperator}\nStatus : {}\nTestcase {}/{} failed\n\nTestcase failed :\n{}\n",
+            "\n{seperator}\n{}\n{seperator}\nStatus : {}\nTestcase {}/{} failed\n\nTestcase failed :\n{}\n\nExpected Output :\n{}\nYour Output :\n{}\n",
             "Submission Wrong!".red().bold(),
             self.status_msg,
-             format!("{}",self.total_correct).green(),
-              format!("{}",self.total_testcases).green(), 
-              self.last_testcase.cyan()
+            format!("{}",self.total_correct).green(),
+            format!("{}",self.total_testcases).green(),
+            self.last_testcase.cyan(),
+            self.expected_output.cyan(),
+            self.code_output.cyan(),
         )
     }
 }
