@@ -20,22 +20,30 @@ struct Cli {
 enum Commands {
     /// Authenticate with LeetCode [ -a ]
     #[command(alias = "-a")]
-    Authenticate,
+    Auth,
     /// Executes code with testcases [ -r ]
+    #[command(alias = "-rt")]
+    RunCustom {
+        /// Testcases to run
+        testcases: String,
+        /// File to execute
+        filename: Option<String>,
+    },
     #[command(alias = "-r")]
     Run {
-        /// File to run
+        /// File to execute with default testcases
         filename: Option<String>,
-        /// Testcases to run
-        testcases: Option<String>,
     },
     /// Submits code to LeetCode [ -s ]
+    #[command(alias = "-fs")]
+    FastSubmit {
+        /// File to submit
+        filename: Option<String>,
+    },
     #[command(alias = "-s")]
     Submit {
         /// File to submit
         filename: Option<String>,
-        /// Run testcases before submitting
-        run_testcases: Option<bool>,
     },
     /// Save a question as HTML [ -q ]
     #[command(alias = "-q")]
@@ -46,6 +54,17 @@ enum Commands {
     /// Save today's daily challenge as HTML [ -d ]
     #[command(alias = "-d")]
     DailyChallenge,
+}
+
+#[derive(Subcommand)]
+enum Execute {
+    #[command(alias = "-t")]
+    Testcases {
+        /// File to run
+        filename: Option<String>,
+        /// Testcases to run
+        testcases: Option<String>,
+    },
 }
 
 fn main() -> ExitCode {
@@ -71,7 +90,7 @@ fn main() -> ExitCode {
     } else {
         let cli = cli.command.unwrap();
         match cli {
-            Commands::Authenticate => {
+            Commands::Auth => {
                 let metadata = lc.get_metadata();
                 if metadata.is_ok() {
                     println!("Authenticated successfully!\n");
@@ -132,31 +151,34 @@ fn main() -> ExitCode {
                     ExitCode::FAILURE
                 }
             }
-            Commands::Run {
-                filename,
+            Commands::RunCustom {
                 testcases,
+                filename,
             } => {
-                if execute_testcases(filename, testcases, &lc).0 {
+                if execute_testcases(filename, Some(testcases), &lc).0 {
                     ExitCode::SUCCESS
                 } else {
                     ExitCode::FAILURE
                 }
             }
-
-            Commands::Submit {
-                filename,
-                run_testcases,
-            } => {
-                let run_testcases = run_testcases.unwrap_or(true);
-
-                let (testcase_result, code_file) = if run_testcases {
-                    execute_testcases(filename, None, &lc)
-                } else if filename.is_some() {
-                    (true, CodeFile::from_file(&filename.unwrap()))
+            Commands::Run { filename } => {
+                if execute_testcases(filename, None, &lc).0 {
+                    ExitCode::SUCCESS
                 } else {
-                    (true, CodeFile::from_dir())
+                    ExitCode::FAILURE
+                }
+            }
+            Commands::FastSubmit { filename } => {
+                let code_file = if filename.is_some() {
+                    CodeFile::from_file(&filename.unwrap())
+                } else {
+                    CodeFile::from_dir()
                 };
 
+                submit(&lc, code_file)
+            }
+            Commands::Submit { filename } => {
+                let (testcase_result, code_file) = execute_testcases(filename, None, &lc);
                 if !testcase_result {
                     println!(
                         "{}",
@@ -166,49 +188,7 @@ fn main() -> ExitCode {
                     );
                     ExitCode::FAILURE
                 } else {
-                    match lc.submit(&code_file) {
-                        Ok(result) => match result {
-                            SubmissionResult::Success(success) => {
-                                success.display();
-                                ExitCode::SUCCESS
-                            }
-                            SubmissionResult::LimitExceeded(wrong) => {
-                                wrong.display();
-                                ExitCode::FAILURE
-                            }
-                            SubmissionResult::PendingResult(state) => {
-                                println!("Pending Result!");
-                                println!("State : {:?}", state.state());
-                                ExitCode::FAILURE
-                            }
-                            SubmissionResult::CompileError(compile_err) => {
-                                println!(
-                        "\nSubmission failed due to Compile Error!\nError Message :\n{}\n\nFull error message :\n{}",
-                        compile_err.compile_error, compile_err.full_compile_error
-                    );
-                                ExitCode::FAILURE
-                            }
-                            SubmissionResult::RuntimeError(runtime_error) => {
-                                println!(
-                        "\nSubmission failed due to Runtime Error!\nError Message :\n{}\n\nFull error message :\n{}",
-                        runtime_error.runtime_error, runtime_error.full_runtime_error
-                    );
-                                ExitCode::FAILURE
-                            }
-                            SubmissionResult::Wrong(wrong) => {
-                                wrong.display();
-                                ExitCode::FAILURE
-                            }
-                            SubmissionResult::Unknown(_) => {
-                                println!("Unknown Error!");
-                                ExitCode::FAILURE
-                            }
-                        },
-                        Err(e) => {
-                            println!("Some error occured! {e}");
-                            return ExitCode::FAILURE;
-                        }
-                    }
+                    submit(&lc, code_file)
                 }
             }
         }
@@ -327,4 +307,50 @@ fn execute_testcases(
         }
     }
     (is_correct, code_file)
+}
+
+fn submit(lc: &LeetCode<Authorized>, code_file: CodeFile) -> ExitCode {
+    match lc.submit(&code_file) {
+        Ok(result) => match result {
+            SubmissionResult::Success(success) => {
+                success.display();
+                ExitCode::SUCCESS
+            }
+            SubmissionResult::LimitExceeded(wrong) => {
+                wrong.display();
+                ExitCode::FAILURE
+            }
+            SubmissionResult::PendingResult(state) => {
+                println!("Pending Result!");
+                println!("State : {:?}", state.state());
+                ExitCode::FAILURE
+            }
+            SubmissionResult::CompileError(compile_err) => {
+                println!(
+                        "\nSubmission failed due to Compile Error!\nError Message :\n{}\n\nFull error message :\n{}",
+                        compile_err.compile_error, compile_err.full_compile_error
+                    );
+                ExitCode::FAILURE
+            }
+            SubmissionResult::RuntimeError(runtime_error) => {
+                println!(
+                        "\nSubmission failed due to Runtime Error!\nError Message :\n{}\n\nFull error message :\n{}",
+                        runtime_error.runtime_error, runtime_error.full_runtime_error
+                    );
+                ExitCode::FAILURE
+            }
+            SubmissionResult::Wrong(wrong) => {
+                wrong.display();
+                ExitCode::FAILURE
+            }
+            SubmissionResult::Unknown(_) => {
+                println!("Unknown Error!");
+                ExitCode::FAILURE
+            }
+        },
+        Err(e) => {
+            println!("Some error occured! {e}");
+            return ExitCode::FAILURE;
+        }
+    }
 }
