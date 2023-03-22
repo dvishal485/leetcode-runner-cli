@@ -44,7 +44,6 @@ pub struct DailyChallengeQuestion {
     pub acRate: f64,
     pub difficulty: String,
     pub frontendQuestionId: String,
-    pub status: String,
     pub title: String,
     pub titleSlug: String,
 }
