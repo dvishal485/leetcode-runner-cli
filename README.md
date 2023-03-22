@@ -123,7 +123,7 @@ fn main() {
 2. If you don't specify file location then the tool will search for code in the current directory and use it by default.
 3. If there are multiple files, then the tool will use file named `main` or the first file it finds in case there is no `main` file.
 
-So, in the above examples, you can simply run the following commands :
+So, in the above examples, you can simply do `cd ./src` and then run the following commands :
 
 - Execute with custom testcases : `leetcode-runner-cli -rt ./testcase.txt`
 - Execute with default testcases : `leetcode-runner-cli -r`
