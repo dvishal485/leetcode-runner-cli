@@ -98,7 +98,7 @@ fn main() -> ExitCode {
                     ExitCode::SUCCESS
                 } else {
                     let error = metadata.unwrap_err();
-                    println!("Authentication Error : {}", error);
+                    eprintln!("Authentication Error : {}", error);
                     ExitCode::FAILURE
                 }
             }
@@ -118,7 +118,7 @@ fn main() -> ExitCode {
                             println!("Saved question as HTML to {}", filename.cyan());
                             ExitCode::SUCCESS
                         } else {
-                            println!("Error saving question as HTML");
+                            eprintln!("Error saving question as HTML");
                             ExitCode::FAILURE
                         }
                     } else {
@@ -143,7 +143,7 @@ fn main() -> ExitCode {
                         println!("Saved question as HTML to {}", filename.cyan());
                         ExitCode::SUCCESS
                     } else {
-                        println!("Error saving question as HTML");
+                        eprintln!("Error saving question as HTML");
                         ExitCode::FAILURE
                     }
                 } else {
@@ -236,21 +236,22 @@ fn execute_testcases(
                             false
                         }
                         ExecutionResult::Unknown(_) => {
-                            println!("Unknown Error!");
+                            eprintln!("Unknown Error!");
                             false
                         }
                     }
                 }
                 Err(e) => {
-                    println!("Some error occured! {e}");
+                    eprintln!("Some error occured! {e}");
                     is_correct = false;
                 }
             }
         } else {
-            println!("Error opening testcases file!");
+            eprintln!("Error opening testcases file!");
             is_correct = false;
         }
     } else {
+        println!();
         match lc.execute_default(&code_file) {
             Ok(result) => {
                 is_correct = match result {
@@ -281,13 +282,13 @@ fn execute_testcases(
                         false
                     }
                     ExecutionResult::Unknown(_) => {
-                        println!("Unknown Error!");
+                        eprintln!("Unknown Error!");
                         false
                     }
                 }
             }
             Err(e) => {
-                println!("Some error occured! {e}");
+                eprintln!("Some error occured! {e}");
                 is_correct = false;
             }
         }
@@ -324,12 +325,12 @@ fn submit(lc: &LeetCode<Authorized>, code_file: CodeFile) -> ExitCode {
                 ExitCode::FAILURE
             }
             SubmissionResult::Unknown(_) => {
-                println!("Unknown Error!");
+                eprintln!("Unknown Error!");
                 ExitCode::FAILURE
             }
         },
         Err(e) => {
-            println!("Some error occured! {e}");
+            eprintln!("Some error occured! {e}");
             return ExitCode::FAILURE;
         }
     }

@@ -39,7 +39,7 @@ impl CodeFile {
         }
         let mut code_file = code_file.unwrap_or_else(|| {
             eprintln!("No code file found. Try creating a file named with proper extension",);
-            panic!("No code file found");
+            std::process::exit(1);
         });
         let mut file = std::fs::File::open(&code_file.path).unwrap();
         let mut code = String::new();
@@ -47,9 +47,9 @@ impl CodeFile {
             .expect(&format!("Failed to read file {}", code_file.path.display()));
         let parsed_file = Self::parse_code(&code);
         let Ok((question_title, parsed_code)) = parsed_file else{
-            eprintln!("{}", parsed_file.err().unwrap());
-            panic!("Error parsing code file");
-        };
+            eprintln!("Error parsing the code file!\n{}", parsed_file.err().unwrap());
+            std::process::exit(1);
+                    };
         code_file.question_title = question_title;
         code_file.code = parsed_code;
         code_file
@@ -101,16 +101,16 @@ impl CodeFile {
             Self::is_valid_file(&path).expect("Improper filename or the language is not supported");
         let file = std::fs::File::open(&path);
         let Ok(mut file) = file else {
-            eprintln!("Error while opening file {}", path.display());
-            panic!("Error while opening file");
+            eprintln!("Error while opening file {}!", path.display());
+            std::process::exit(1);
         };
         let mut code = String::new();
         file.read_to_string(&mut code)
             .expect(&format!("Failed to read file {}", path.display()));
         let parsed_file = Self::parse_code(&code);
         let Ok((question_title, parsed_code)) = parsed_file else{
-            eprintln!("{}", parsed_file.err().unwrap());
-panic!("Error parsing code file");
+            eprintln!("Error parsing the code file!\n{}", parsed_file.err().unwrap());
+            std::process::exit(1);
         };
         valid_file.question_title = question_title;
         valid_file.code = parsed_code;
