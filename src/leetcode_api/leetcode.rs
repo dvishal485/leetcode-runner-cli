@@ -1,6 +1,6 @@
 use super::helpers::*;
 use super::user::*;
-use super::worker::*;
+use super::utils::*;
 use crate::file_parser::codefile::CodeFile;
 
 use serde::Deserialize;
@@ -65,8 +65,8 @@ impl LeetCode<Authorized> {
         let url = "https://leetcode.com/graphql";
         let client = &self.client;
         let query = GraphqlRequest {
-   query: "\n query questionOfToday {\n  activeDailyCodingChallengeQuestion {\n date\n userStatus\n link\n question {\n   acRate\n   difficulty\n   freqBar\n   frontendQuestionId: questionFrontendId\n   isFavor\n   paidOnly: isPaidOnly\n   status\n   title\n   titleSlug\n   hasVideoSolution\n   hasSolution\n   topicTags {\n  name\n  id\n  slug\n   }\n }\n  }\n}\n ".to_string(),
-   variables: "{}".to_string(),
+            query: "\n query questionOfToday {\n  activeDailyCodingChallengeQuestion {\n date\n userStatus\n link\n question {\n   acRate\n   difficulty\n   freqBar\n   frontendQuestionId: questionFrontendId\n   isFavor\n   paidOnly: isPaidOnly\n   status\n   title\n   titleSlug\n   hasVideoSolution\n   hasSolution\n   topicTags {\n  name\n  id\n  slug\n   }\n }\n  }\n}\n ".to_string(),
+            variables: "{}".to_string(),
   };
         let Ok(data) = client.post(url).json(&query).send() else {
  return Err("Failed to fetch daily challenge from leetcode!");
@@ -183,23 +183,26 @@ impl LeetCode<Authorized> {
                 "\nFor example : Input \"{}\" for {}",
                 0, &boiler_code_vector[0].langSlug
             );
-            std::io::stdin()
-                .read_line(&mut input)
-                .expect("Failed to read line!");
+            if let Err(_) = std::io::stdin().read_line(&mut input) {
+                return Err("Failed to read input!");
+            }
             let input = input.trim();
-            let input = input.parse::<usize>().expect("Failed to parse input!");
-            boiler_code_vector
-                .into_iter()
-                .nth(input)
-                .expect("Invalid input")
+            let Ok(input) = input.parse::<usize>() else {
+                return Err("Invalid input!");
+            };
+            if let Some(code) = boiler_code_vector.into_iter().nth(input) {
+                code
+            } else {
+                return Err("Invalid input!");
+            }
         } else {
             return Err("No boiler plate code available in supported language!");
         };
         let mut input = String::new();
         println!("Filename (main.{}) : ", &(boiler_code.extension()));
-        std::io::stdin()
-            .read_line(&mut input)
-            .expect("Failed to read line");
+        if let Err(_) = std::io::stdin().read_line(&mut input) {
+            return Err("Failed to read input!");
+        }
         let input = input.trim();
         let filename = if input.is_empty() {
             format!("main.{}", boiler_code.extension())

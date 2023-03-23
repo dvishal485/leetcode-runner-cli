@@ -1,5 +1,5 @@
 use crate::file_parser::codefile::CodeFile;
-use crate::leetcode_api::worker::{ExecutionResult, SubmissionResult};
+use crate::leetcode_api::utils::{ExecutionResult, SubmissionResult};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 use leetcode_api::leetcode::{Authorized, LeetCode};
@@ -72,10 +72,13 @@ fn main() -> ExitCode {
 
     let key = "LC_COOKIE";
     let Some(cookie) = std::env::var_os(key) else {
-        println!("{} is not set in the environment.", key);
+        eprintln!("{} is not set in the environment.", key);
         return ExitCode::FAILURE;
     };
-    let cookie = cookie.to_str().expect("Invalid unicode in cookie");
+    let Some( cookie) = cookie.to_str() else {
+        eprintln!("Invalid characted found in cookie!");
+        return ExitCode::FAILURE;
+    };
 
     let mut leetcode = LeetCode::new();
     let lc = leetcode.authenticate(cookie).unwrap();

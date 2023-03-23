@@ -73,10 +73,15 @@ pub struct BoilerPlateCode {
 use super::super::file_parser::language::Language;
 impl BoilerPlateCode {
     pub(crate) fn save_code(&self, filename: &str) {
-        let mut file = std::fs::File::create(filename).expect("Error: Unable to create file");
+        let Ok(mut file) = std::fs::File::create(filename) else{
+            eprintln!("Error: Unable to create file");
+            std::process::exit(1);
+        };
         // write code into file
-        std::io::Write::write_all(&mut file, self.code.as_bytes())
-            .expect("Error: Unable to write to file");
+        if let Err(_) = std::io::Write::write_all(&mut file, self.code.as_bytes()) {
+            eprintln!("Error: Unable to write code into file");
+            std::process::exit(1);
+        }
     }
     pub(crate) fn is_supported(&self) -> bool {
         let language = Language::from_slug(&self.langSlug);

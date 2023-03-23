@@ -1,5 +1,5 @@
 use super::language::*;
-use std::{io::Read, path::PathBuf};
+use std::path::PathBuf;
 
 pub struct CodeFile {
     pub language: Language,
@@ -41,10 +41,11 @@ impl CodeFile {
             eprintln!("No code file found! Try creating a file named with proper extension",);
             std::process::exit(1);
         });
-        let mut file = std::fs::File::open(&code_file.path).unwrap();
-        let mut code = String::new();
-        file.read_to_string(&mut code)
-            .expect(&format!("Failed to read file {}!", code_file.path.display()));
+        let Ok(code) = std::fs::read_to_string(&code_file.path) else { 
+            eprintln!("Error reading the code file!");
+            std::process::exit(1);
+        };
+
         let parsed_file = Self::parse_code(&code);
         let Ok((question_title, parsed_code)) = parsed_file else{
             eprintln!("Error parsing the code file!\n{}", parsed_file.err().unwrap());
@@ -97,16 +98,15 @@ impl CodeFile {
 
     pub fn from_file(path: &str) -> Self {
         let path = PathBuf::from(&path);
-        let (_, mut valid_file) =
-            Self::is_valid_file(&path).expect("Improper filename or the language is not supported");
-        let file = std::fs::File::open(&path);
-        let Ok(mut file) = file else {
-            eprintln!("Error while opening file {}!", path.display());
+        let Some(file) =  Self::is_valid_file(&path) else { 
+            eprintln!("Invalid file!");
             std::process::exit(1);
         };
-        let mut code = String::new();
-        file.read_to_string(&mut code)
-            .expect(&format!("Failed to read file {}!", path.display()));
+        let (_, mut valid_file) = file;
+        let Ok(code) = std::fs::read_to_string(&path) else {
+            eprintln!("Error while reading file {}!", path.display());
+            std::process::exit(1);
+        };
         let parsed_file = Self::parse_code(&code);
         let Ok((question_title, parsed_code)) = parsed_file else{
             eprintln!("Error parsing the code file!\n{}", parsed_file.err().unwrap());
