@@ -179,4 +179,25 @@ impl Success {
     pub fn is_correct(&self) -> bool {
         self.correct_answer
     }
+    pub fn display(&self) {
+        println!("{}", self);
+    }
+}
+
+impl LimitExceeded {
+    pub fn display(&self) {
+        println!("{}", self);
+    }
+}
+
+impl CompileError {
+    pub fn display(&self) {
+        println!("{}", self);
+    }
+}
+
+impl RuntimeError {
+    pub fn display(&self) {
+        println!("{}", self);
+    }
 }

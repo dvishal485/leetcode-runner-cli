@@ -105,6 +105,43 @@ pub struct SubmitCompileError {
     pub state: String,
 }
 
+impl std::fmt::Display for SubmitCompileError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let seperator = "-------------------------------";
+        write!(
+            f,
+            "{}\n{}\nError Message :\n{}\n{}\nFull error message :\n{}",
+            "Submission failed due to Compile Error!".red().bold(),
+            seperator.yellow(),
+            self.compile_error,
+            seperator.yellow(),
+            self.full_compile_error
+        )
+    }
+}
+
+impl std::fmt::Display for SubmitRuntimeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let seperator = "-------------------------------";
+        write!(
+            f,
+            "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
+            "Submission failed due to Runtime Error!".red().bold(),
+            seperator.yellow(),
+            "Error Message :".yellow(),
+            self.runtime_error,
+            seperator.yellow(),
+            "Full error message :".yellow(),
+            self.full_runtime_error,
+            seperator.yellow(),
+            "Last testcase executed :".yellow(),
+            self.last_testcase,
+            "Std output :\n".yellow(),
+            self.std_output,
+        )
+    }
+}
+
 impl std::fmt::Display for SubmitCorrect {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let seperator = "-------------------------------";
@@ -162,6 +199,18 @@ impl SubmitLimitExceeded {
 }
 
 impl SubmitCorrect {
+    pub fn display(&self) {
+        println!("{}", self);
+    }
+}
+
+impl SubmitCompileError {
+    pub fn display(&self) {
+        println!("{}", self);
+    }
+}
+
+impl SubmitRuntimeError {
     pub fn display(&self) {
         println!("{}", self);
     }

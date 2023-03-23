@@ -216,19 +216,19 @@ fn execute_testcases(
                 Ok(result) => {
                     is_correct = match result {
                         ExecutionResult::Success(result) => {
-                            println!("{}", result);
+                            result.display();
                             result.is_correct()
                         }
                         ExecutionResult::LimitExceeded(limit_exceeded) => {
-                            println!("{}", limit_exceeded);
+                            limit_exceeded.display();
                             false
                         }
                         ExecutionResult::CompileError(compile_error) => {
-                            println!("{}", compile_error);
+                            compile_error.display();
                             false
                         }
                         ExecutionResult::RuntimeError(runtime_error) => {
-                            println!("{}", runtime_error);
+                            runtime_error.display();
                             false
                         }
                         ExecutionResult::PendingResult(state) => {
@@ -255,7 +255,7 @@ fn execute_testcases(
             Ok(result) => {
                 is_correct = match result {
                     ExecutionResult::Success(result) => {
-                        println!("{}", result);
+                        result.display();
                         if !result.is_correct() {
                             println!(
                                 "{}",
@@ -265,15 +265,15 @@ fn execute_testcases(
                         result.is_correct()
                     }
                     ExecutionResult::LimitExceeded(limit_exceeded) => {
-                        println!("{}", limit_exceeded);
+                        limit_exceeded.display();
                         false
                     }
                     ExecutionResult::CompileError(compile_error) => {
-                        println!("{}", compile_error);
+                        compile_error.display();
                         false
                     }
                     ExecutionResult::RuntimeError(runtime_error) => {
-                        println!("{}", runtime_error);
+                        runtime_error.display();
                         false
                     }
                     ExecutionResult::PendingResult(state) => {
@@ -296,6 +296,7 @@ fn execute_testcases(
 }
 
 fn submit(lc: &LeetCode<Authorized>, code_file: CodeFile) -> ExitCode {
+    println!();
     match lc.submit(&code_file) {
         Ok(result) => match result {
             SubmissionResult::Success(success) => {
@@ -307,22 +308,15 @@ fn submit(lc: &LeetCode<Authorized>, code_file: CodeFile) -> ExitCode {
                 ExitCode::FAILURE
             }
             SubmissionResult::PendingResult(state) => {
-                println!("Pending Result!");
-                println!("State : {:?}", state.state());
+                println!("{}", state);
                 ExitCode::FAILURE
             }
             SubmissionResult::CompileError(compile_err) => {
-                println!(
-                        "\nSubmission failed due to Compile Error!\nError Message :\n{}\n\nFull error message :\n{}",
-                        compile_err.compile_error, compile_err.full_compile_error
-                    );
+                compile_err.display();
                 ExitCode::FAILURE
             }
             SubmissionResult::RuntimeError(runtime_error) => {
-                println!(
-                        "\nSubmission failed due to Runtime Error!\nError Message :\n{}\n\nFull error message :\n{}",
-                        runtime_error.runtime_error, runtime_error.full_runtime_error
-                    );
+                runtime_error.display();
                 ExitCode::FAILURE
             }
             SubmissionResult::Wrong(wrong) => {
