@@ -211,9 +211,9 @@ fn execute_testcases(
         if let Ok(mut testcase) = std::fs::File::open(testcases) {
             let mut data_input = String::new();
             std::io::Read::read_to_string(&mut testcase, &mut data_input).unwrap();
-            println!();
             match lc.execute(&code_file, data_input) {
                 Ok(result) => {
+                    println!();
                     is_correct = match result {
                         ExecutionResult::Success(result) => {
                             result.display();
@@ -251,8 +251,9 @@ fn execute_testcases(
             is_correct = false;
         }
     } else {
+        let result = lc.execute_default(&code_file);
         println!();
-        match lc.execute_default(&code_file) {
+        match result {
             Ok(result) => {
                 is_correct = match result {
                     ExecutionResult::Success(result) => {
@@ -297,7 +298,6 @@ fn execute_testcases(
 }
 
 fn submit(lc: &LeetCode<Authorized>, code_file: CodeFile) -> ExitCode {
-    println!();
     match lc.submit(&code_file) {
         Ok(result) => match result {
             SubmissionResult::Success(success) => {

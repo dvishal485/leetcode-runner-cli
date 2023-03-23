@@ -25,13 +25,13 @@ impl LeetCode {
 impl LeetCode<Unauthorized> {
     /// # Authenticate with cookie
     /// Builds a new reqwest client with the cookie
-    pub fn authenticate(&mut self, cookie: &str) -> Result<LeetCode<Authorized>, String> {
+    pub fn authenticate(&mut self, cookie: &str) -> Result<LeetCode<Authorized>, &str> {
         let mut headers = reqwest::header::HeaderMap::with_capacity(5);
         let Some(csrf_token) = cookie
    .split(';')
    .find(|s| s.contains("csrftoken"))
-   else{ Err("No csrf token found".to_string())? };
-        let Some(csrf_token) = csrf_token.split('=').last() else{ Err("No csrf token found".to_string())? };
+   else{return  Err("No csrf token found"); };
+        let Some(csrf_token) = csrf_token.split('=').last() else{return Err("No csrf token found"); };
         let csrf_token = csrf_token.to_string();
         headers.insert(
             reqwest::header::COOKIE,
@@ -61,7 +61,7 @@ impl LeetCode<Unauthorized> {
 }
 
 impl LeetCode<Authorized> {
-    pub fn get_daily_challenge(&self) -> Result<DailyChallenge, String> {
+    pub fn get_daily_challenge(&self) -> Result<DailyChallenge, &str> {
         let url = "https://leetcode.com/graphql";
         let client = &self.client;
         let query = GraphqlRequest {
@@ -69,7 +69,7 @@ impl LeetCode<Authorized> {
    variables: "{}".to_string(),
   };
         let Ok(data) = client.post(url).json(&query).send() else {
- return Err("Failed to fetch daily challenge from leetcode".to_string());
+ return Err("Failed to fetch daily challenge from leetcode!");
    };
         // println!("{:?}", data.text());
         // todo!();
@@ -84,31 +84,31 @@ impl LeetCode<Authorized> {
         }
         Ok(data
             .json::<Wrapper>()
-            .map_err(|_| "Failed to parse daily challenge!".to_string())?
+            .map_err(|_| "Failed to parse daily challenge!")?
             .data
             .activeDailyCodingChallengeQuestion)
     }
 
-    pub fn get_metadata(&self) -> Result<UserMetadata, String> {
+    pub fn get_metadata(&self) -> Result<UserMetadata, &str> {
         let client = &self.client;
         let Ok(data) = client
    .get("https://leetcode.com/api/problems/all/")
    .send() else {
- return Err("Failed to fetch metadata from leetcode".to_string());
+ return Err("Failed to fetch metadata from leetcode!");
    };
 
         let metadata = data
             .json::<UserMetadata>()
-            .map_err(|_| "Failed to parse metadata, try renewing cookie".to_string());
+            .map_err(|_| "Failed to parse metadata! Try renewing cookie");
         if let Ok(metadata) = metadata.as_ref() {
             if metadata.user_name == "" {
-                return Err(String::from("Cookie invalid. Renew cookies"));
+                return Err("Cookie invalid. Renew cookies");
             }
         }
         metadata
     }
 
-    pub fn question_content(&self, title_slug: &str) -> Result<LeetcodeQuestion, String> {
+    pub fn question_content(&self, title_slug: &str) -> Result<LeetcodeQuestion, &str> {
         let client = &self.client;
         let url = "https://leetcode.com/graphql";
         let query = GraphqlRequest {
@@ -117,7 +117,7 @@ impl LeetCode<Authorized> {
   };
 
         let Ok(data) = client.post(url).json(&query).send() else {
- return Err("Failed to fetch question id from leetcode".to_string());
+ return Err("Failed to fetch question id from leetcode!");
    };
         #[derive(Deserialize)]
         struct QuestionWrapper {
@@ -141,7 +141,7 @@ impl LeetCode<Authorized> {
                 variables: varibales,
             })
             .send() else {
-            return Err("Failed to fetch boiler plate code!".to_string());
+            return Err("Failed to fetch boiler plate code!");
             };
 
         #[derive(Debug, Deserialize)]
@@ -160,7 +160,7 @@ impl LeetCode<Authorized> {
 
         let boiler_code_vector = boiler_code
             .json::<Wrapper>()
-            .map_err(|_| "Failed to parse boiler plate code!".to_string())?
+            .map_err(|_| "Failed to parse boiler plate code!")?
             .data
             .question
             .codeSnippets;
@@ -185,15 +185,15 @@ impl LeetCode<Authorized> {
             );
             std::io::stdin()
                 .read_line(&mut input)
-                .expect("Failed to read line");
+                .expect("Failed to read line!");
             let input = input.trim();
-            let input = input.parse::<usize>().expect("Failed to parse input");
+            let input = input.parse::<usize>().expect("Failed to parse input!");
             boiler_code_vector
                 .into_iter()
                 .nth(input)
                 .expect("Invalid input")
         } else {
-            return Err("No boiler plate code available in supported language".to_string());
+            return Err("No boiler plate code available in supported language!");
         };
         let mut input = String::new();
         println!("Filename (main.{}) : ", &(boiler_code.extension()));
@@ -209,11 +209,11 @@ impl LeetCode<Authorized> {
         boiler_code.save_code(&filename);
 
         data.json::<Data>()
-            .map_err(|_| "Failed to parse question content".to_string())
+            .map_err(|_| "Failed to parse question content!")
             .map(|op| op.data.question)
     }
 
-    pub fn question_metadata(&self, title_slug: &str) -> Result<Question, String> {
+    pub fn question_metadata(&self, title_slug: &str) -> Result<Question, &str> {
         let client = &self.client;
         let url = "https://leetcode.com/graphql";
 
@@ -222,7 +222,7 @@ impl LeetCode<Authorized> {
    variables: serde_json::to_string(&Variables { titleSlug: title_slug.to_string() }).unwrap(),
   };
         let Ok(data) = client.post(url).json(&query).send() else {
- return Err("Failed to fetch question id from leetcode".to_string());
+ return Err("Failed to fetch question id from leetcode!");
    };
 
         #[derive(Debug, Deserialize)]
@@ -236,17 +236,17 @@ impl LeetCode<Authorized> {
         }
 
         data.json::<Data>()
-            .map_err(|_| "Failed to parse question id from leetcode".to_string())
+            .map_err(|_| "Failed to parse question id from leetcode!")
             .map(|opt| opt.data.question)
     }
-    pub fn execute_default(&self, codefile: &CodeFile) -> Result<ExecutionResult, String> {
+    pub fn execute_default(&self, codefile: &CodeFile) -> Result<ExecutionResult, &str> {
         self.execute(codefile, String::new())
     }
     pub fn execute(
         &self,
         codefile: &CodeFile,
         mut data_input: String,
-    ) -> Result<ExecutionResult, String> {
+    ) -> Result<ExecutionResult, &str> {
         let question_title = codefile.question_title.clone();
         let ques = self.question_metadata(&question_title)?;
         if data_input == "" {
@@ -256,10 +256,10 @@ impl LeetCode<Authorized> {
                 if let Ok(_) = std::io::Write::write_all(&mut file, data_input.as_bytes()) {
                     println!("Wrote default testcases to testcase.txt");
                 } else {
-                    println!("Failed to write default testcases to testcase.txt");
+                    eprintln!("Failed to write default testcases to testcase.txt!");
                 }
             } else {
-                println!("Failed to create testcase.txt!");
+                eprintln!("Failed to create testcase.txt!");
             }
         }
         let question_id = ques.questionId;
@@ -279,7 +279,7 @@ impl LeetCode<Authorized> {
         question_title: String,
         typed_code: String,
         data_input: String,
-    ) -> Result<ExecutionResult, String> {
+    ) -> Result<ExecutionResult, &str> {
         let client = &self.client;
         let url = format!(
             "https://leetcode.com/problems/{}/interpret_solution/",
@@ -293,10 +293,10 @@ impl LeetCode<Authorized> {
             data_input,
         };
         let Ok(data)= client.post(&url).json(&testcase).send() else {
- return Err("Failed to parse arguments".to_string());
+ return Err("Failed to parse arguments!");
    };
         let Ok(data) = data.json::<InterpretID>() else{
- return Err("Failed to parse JSON from leetcode. Try again after sometime or renew cookie".to_string());
+ return Err("Failed to parse JSON from leetcode! Try again after sometime or renew cookie");
    };
 
         let interpret_id = data.interpret_id;
@@ -306,11 +306,11 @@ impl LeetCode<Authorized> {
             let url = format!("https://leetcode.com/submissions/detail/{interpret_id}/check/");
             // std::thread::sleep(std::time::Duration::from_secs(7));
             let Ok(data) = client.get(&url).send() else {
- return Err("Failed to parse arguments".to_string());
+ return Err("Failed to parse arguments!");
    };
 
             let Ok(data) = data.json::<ExecutionResult>() else  {
-  return Err("Failed to parse JSON from leetcode. Try again after sometime or renew cookie".to_string());
+  return Err("Failed to parse JSON from leetcode! Try again after sometime or renew cookie");
   };
             match data {
                 ExecutionResult::PendingResult(data) => {
@@ -343,7 +343,7 @@ impl LeetCode<Authorized> {
             };
         }
     }
-    pub fn submit(&self, codefile: &CodeFile) -> Result<SubmissionResult, String> {
+    pub fn submit(&self, codefile: &CodeFile) -> Result<SubmissionResult, &str> {
         let question_title = codefile.question_title.clone();
         let ques = self.question_metadata(&question_title)?;
         let question_id = ques.questionId;
@@ -361,7 +361,7 @@ impl LeetCode<Authorized> {
         question_id: String,
         question_title: String,
         typed_code: String,
-    ) -> Result<SubmissionResult, String> {
+    ) -> Result<SubmissionResult, &str> {
         let client = &self.client;
         let url = format!("https://leetcode.com/problems/{}/submit/", question_title);
         let submission = SubmitCode {
@@ -370,7 +370,7 @@ impl LeetCode<Authorized> {
             typed_code,
         };
         let Ok(data)= client.post(&url).json(&submission).send() else {
- return Err("Failed to parse arguments".to_string());
+ return Err("Failed to parse arguments");
    };
         #[derive(Debug, Deserialize)]
         struct SubmissionID {
@@ -378,7 +378,7 @@ impl LeetCode<Authorized> {
         }
         // println!("{}", data.text().unwrap());
         let Ok(data) = data.json::<SubmissionID>() else {
- return Err("Failed to fetch submission id from leetcode. Check your submissions manually on leetcode".to_string());
+ return Err("Failed to fetch submission id from leetcode! Check your submissions manually on leetcode");
    };
         println!("Evaluating solution...");
         let submission_id = data.submission_id;
@@ -387,11 +387,11 @@ impl LeetCode<Authorized> {
         loop {
             let url = format!("https://leetcode.com/submissions/detail/{submission_id}/check/");
             let Ok(data) = client.get(&url).send() else {
- return Err("Failed to parse arguments".to_string());
+ return Err("Failed to parse arguments!");
    };
 
             let Ok(data) = data.json::<SubmissionResult>() else  {
-  return Err("Failed to fetch from leetcode. Try again after sometime or renew cookie".to_string());
+  return Err("Failed to fetch from leetcode! Try again after sometime or renew cookie");
   };
             match data {
                 SubmissionResult::PendingResult(data) => {

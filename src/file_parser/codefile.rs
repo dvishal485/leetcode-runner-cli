@@ -38,13 +38,13 @@ impl CodeFile {
             }
         }
         let mut code_file = code_file.unwrap_or_else(|| {
-            eprintln!("No code file found. Try creating a file named with proper extension",);
+            eprintln!("No code file found! Try creating a file named with proper extension",);
             std::process::exit(1);
         });
         let mut file = std::fs::File::open(&code_file.path).unwrap();
         let mut code = String::new();
         file.read_to_string(&mut code)
-            .expect(&format!("Failed to read file {}", code_file.path.display()));
+            .expect(&format!("Failed to read file {}!", code_file.path.display()));
         let parsed_file = Self::parse_code(&code);
         let Ok((question_title, parsed_code)) = parsed_file else{
             eprintln!("Error parsing the code file!\n{}", parsed_file.err().unwrap());
@@ -71,7 +71,7 @@ impl CodeFile {
         ))
     }
 
-    fn parse_code(code: &str) -> Result<(String, String), String> {
+    fn parse_code(code: &str) -> Result<(String, String), &str> {
         let question_title: String;
         let parsed_code: String;
         let start = code
@@ -88,7 +88,7 @@ impl CodeFile {
             let problem = problem.split('/').skip(2).next().unwrap();
             question_title = problem.to_string();
         } else {
-            return Err("No leetcode problem found in the code file. Please add the problem link in the code file using comments.".to_string());
+            return Err("No leetcode problem found in the code file. Please add the problem link in the code file using comments.");
         }
         parsed_code = code[start..end].to_string();
 
@@ -106,7 +106,7 @@ impl CodeFile {
         };
         let mut code = String::new();
         file.read_to_string(&mut code)
-            .expect(&format!("Failed to read file {}", path.display()));
+            .expect(&format!("Failed to read file {}!", path.display()));
         let parsed_file = Self::parse_code(&code);
         let Ok((question_title, parsed_code)) = parsed_file else{
             eprintln!("Error parsing the code file!\n{}", parsed_file.err().unwrap());
