@@ -211,47 +211,44 @@ fn execute_testcases(
         code_file = CodeFile::from_dir();
     }
     if let Some(testcases) = testcases {
-        if let Ok(mut testcase) = std::fs::File::open(testcases) {
-            let mut data_input = String::new();
-            std::io::Read::read_to_string(&mut testcase, &mut data_input).unwrap();
-            match lc.execute(&code_file, data_input) {
-                Ok(result) => {
-                    println!();
-                    is_correct = match result {
-                        ExecutionResult::Success(result) => {
-                            result.display();
-                            result.is_correct()
-                        }
-                        ExecutionResult::LimitExceeded(limit_exceeded) => {
-                            limit_exceeded.display();
-                            false
-                        }
-                        ExecutionResult::CompileError(compile_error) => {
-                            compile_error.display();
-                            false
-                        }
-                        ExecutionResult::RuntimeError(runtime_error) => {
-                            runtime_error.display();
-                            false
-                        }
-                        ExecutionResult::PendingResult(state) => {
-                            println!("{}", state);
-                            false
-                        }
-                        ExecutionResult::Unknown(_) => {
-                            eprintln!("Unknown Error!");
-                            false
-                        }
+        let Ok(data_input) = std::fs::read_to_string(&testcases) else{
+            eprintln!("Error opening testcases file!");
+            return (false, code_file);       
+        };
+        match lc.execute(&code_file, data_input) {
+            Ok(result) => {
+                println!();
+                is_correct = match result {
+                    ExecutionResult::Success(result) => {
+                        result.display();
+                        result.is_correct()
+                    }
+                    ExecutionResult::LimitExceeded(limit_exceeded) => {
+                        limit_exceeded.display();
+                        false
+                    }
+                    ExecutionResult::CompileError(compile_error) => {
+                        compile_error.display();
+                        false
+                    }
+                    ExecutionResult::RuntimeError(runtime_error) => {
+                        runtime_error.display();
+                        false
+                    }
+                    ExecutionResult::PendingResult(state) => {
+                        println!("{}", state);
+                        false
+                    }
+                    ExecutionResult::Unknown(_) => {
+                        eprintln!("Unknown Error!");
+                        false
                     }
                 }
-                Err(e) => {
-                    eprintln!("Some error occured! {e}");
-                    is_correct = false;
-                }
             }
-        } else {
-            eprintln!("Error opening testcases file!");
-            is_correct = false;
+            Err(e) => {
+                eprintln!("Some error occured! {e}");
+                is_correct = false;
+            }
         }
     } else {
         let result = lc.execute_default(&code_file);

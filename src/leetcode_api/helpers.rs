@@ -92,7 +92,10 @@ impl BoilerPlateCode {
         }
     }
     pub(crate) fn extension(&self) -> String {
-        let language = Language::from_slug(&self.langSlug).unwrap();
+        let language = Language::from_slug(&self.langSlug).unwrap_or_else(|| {
+            eprintln!("Error: Unable to identify language of code file!");
+            std::process::exit(1);
+        });
         language.extension().to_owned()
     }
 }

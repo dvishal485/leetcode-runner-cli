@@ -22,7 +22,10 @@ impl Default for CodeFile {
 impl CodeFile {
     pub fn from_dir() -> Self {
         let mut code_file: Option<CodeFile> = None;
-        let files = std::fs::read_dir("./").unwrap();
+        let Ok(files) = std::fs::read_dir("./") else {
+            eprintln!("Error reading the current directory!");
+            std::process::exit(1);
+        };
         for file in files {
             let Ok(file) = file else {
                 // Bad path
@@ -48,7 +51,7 @@ impl CodeFile {
 
         let parsed_file = Self::parse_code(&code);
         let Ok((question_title, parsed_code)) = parsed_file else{
-            eprintln!("Error parsing the code file!\n{}", parsed_file.err().unwrap());
+            eprintln!("Error parsing the code file!\n{}", parsed_file.unwrap_err());
             std::process::exit(1);
                     };
         code_file.question_title = question_title;
@@ -109,7 +112,7 @@ impl CodeFile {
         };
         let parsed_file = Self::parse_code(&code);
         let Ok((question_title, parsed_code)) = parsed_file else{
-            eprintln!("Error parsing the code file!\n{}", parsed_file.err().unwrap());
+            eprintln!("Error parsing the code file!\n{}", parsed_file.unwrap_err());
             std::process::exit(1);
         };
         valid_file.question_title = question_title;
