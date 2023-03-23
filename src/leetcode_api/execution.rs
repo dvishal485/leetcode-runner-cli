@@ -69,15 +69,58 @@ pub struct LimitExceeded {
     pub state: String,
 }
 
-impl Success {
-    pub fn is_correct(&self) -> bool {
-        self.correct_answer
-    }
-    pub fn display(&self) {
+impl std::fmt::Display for LimitExceeded {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let seperator = "-------------------------------";
+        write!(
+            f,
+            "{}\n{}\nTime Elapsed : {}\nMemory : {}",
+            self.status_msg.red().bold(),
+            seperator.yellow(),
+            self.elapsed_time,
+            self.memory
+        )
+    }
+}
 
-        println!(
-            "\n{}\n\nOutput   : {:?}\nExpected : {:?}\n",
+impl std::fmt::Display for CompileError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let seperator = "-------------------------------";
+        write!(
+            f,
+            "{}\n{}\nError Message : {}\n\nFull error message :\n{}",
+            "Compilation Error!".red().bold(),
+            seperator.yellow(),
+            self.compile_error,
+            self.full_compile_error
+        )
+    }
+}
+
+impl std::fmt::Display for RuntimeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let seperator = "-------------------------------";
+        write!(
+            f,
+            "{}\nTestcase {} failed during execution!\n{}\n{}\n {}\n\n{}\n{}\n{}\n{}",
+            "Runtime Error!".red().bold(),
+            format!("{}", self.std_output.len()).red(),
+            seperator.yellow(),
+            "Error Message :".yellow(),
+            self.runtime_error,
+            "Full error message :".yellow(),
+            self.full_runtime_error,
+            seperator.yellow(),
+            format!("{}\n{:?}", "Std Output :".yellow(), self.std_output)
+        )
+    }
+}
+
+impl std::fmt::Display for Success {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let seperator = "-------------------------------";
+        let part1 = format!(
+            "{}\n\nOutput   : {:?}\nExpected : {:?}\n",
             if self.correct_answer {
                 "Testcase execution success".green().bold()
             } else {
@@ -91,11 +134,11 @@ impl Success {
             self.code_answer,
             self.expected_code_answer
         );
-
+        let mut part2 = Vec::with_capacity(self.code_answer.len());
         for i in 0..self.code_answer.len() {
             let is_correct = self.code_answer[i] == self.expected_code_answer[i];
-            println!(
-                "{}\n{}\n{}\nOutput   : {:?}\nExpected : {:?}\n{}",
+            part2.push(format!(
+                "{}\n{}\n{}\nOutput   : {:?}\nExpected : {:?}\n\n{}",
                 seperator.yellow(),
                 if is_correct {
                     format!("Testcase {} execution success", i + 1).green()
@@ -106,14 +149,14 @@ impl Success {
                 self.code_answer[i],
                 self.expected_code_answer[i],
                 if !self.std_output[i].is_empty() {
-                    format!("\nStd Output :\n{}\n", self.std_output[i])
+                    format!("Std Output :\n{}\n", self.std_output[i])
                 } else {
-                    format!("")
+                    String::new()
                 }
-            );
+            ));
         }
 
-        println!(
+        let part3 = format!(
             "{}\nRuntime  : {}\nOutput   : {}\nExpected : {}\n",
             seperator.yellow(),
             self.status_runtime.cyan(),
@@ -121,11 +164,19 @@ impl Success {
             self.expected_status_runtime
         );
 
-        println!(
-            "Memory   : {}\nOutput   : {}\nExpected : {}\n",
+        let part4 = format!(
+            "{}\nMemory   : {}\nOutput   : {}\nExpected : {}\n",
+            seperator.yellow(),
             self.status_memory.cyan(),
             self.memory,
             self.expected_memory
         );
+        write!(f, "{}{}{}{}", part1, part2.join(""), part3, part4)
+    }
+}
+
+impl Success {
+    pub fn is_correct(&self) -> bool {
+        self.correct_answer
     }
 }

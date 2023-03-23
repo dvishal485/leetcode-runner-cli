@@ -211,49 +211,36 @@ fn execute_testcases(
         if let Ok(mut testcase) = std::fs::File::open(testcases) {
             let mut data_input = String::new();
             std::io::Read::read_to_string(&mut testcase, &mut data_input).unwrap();
-
+            println!();
             match lc.execute(&code_file, data_input) {
-                Ok(result) => match result {
-                    ExecutionResult::Success(result) => {
-                        result.display();
-                        is_correct = result.is_correct();
+                Ok(result) => {
+                    is_correct = match result {
+                        ExecutionResult::Success(result) => {
+                            println!("{}", result);
+                            result.is_correct()
+                        }
+                        ExecutionResult::LimitExceeded(limit_exceeded) => {
+                            println!("{}", limit_exceeded);
+                            false
+                        }
+                        ExecutionResult::CompileError(compile_error) => {
+                            println!("{}", compile_error);
+                            false
+                        }
+                        ExecutionResult::RuntimeError(runtime_error) => {
+                            println!("{}", runtime_error);
+                            false
+                        }
+                        ExecutionResult::PendingResult(state) => {
+                            println!("{}", state);
+                            false
+                        }
+                        ExecutionResult::Unknown(_) => {
+                            println!("Unknown Error!");
+                            false
+                        }
                     }
-                    ExecutionResult::LimitExceeded(limit_exceeded) => {
-                        println!("{}", limit_exceeded.status_msg);
-                        println!("Time Elapsed : {}", limit_exceeded.elapsed_time);
-                        println!("Memory : {}", limit_exceeded.memory);
-                        is_correct = false;
-                    }
-                    ExecutionResult::CompileError(compile_error) => {
-                        println!(
-                            "Compile Error!\nError Message : {}\n\nFull error message :\n{}",
-                            compile_error.compile_error, compile_error.full_compile_error
-                        );
-                        is_correct = false;
-                    }
-                    ExecutionResult::RuntimeError(runtime_error) => {
-                        println!(
-                            "{}\nTestcase {} failed during execution!\n\n{}\n {}\n\n{}\n{}\n\n{}",
-                            "Runtime Error!".red().bold(),
-                            format!("{}", runtime_error.std_output.len()).red(),
-                            "Error Message :".yellow(),
-                            runtime_error.runtime_error,
-                            "Full error message :".yellow(),
-                            runtime_error.full_runtime_error,
-                            format!("Std Output :\n{:?}", runtime_error.std_output)
-                        );
-                        is_correct = false;
-                    }
-                    ExecutionResult::PendingResult(state) => {
-                        println!("Pending Result!");
-                        println!("State : {:?}", state.state());
-                        is_correct = false;
-                    }
-                    ExecutionResult::Unknown(_) => {
-                        println!("Unknown Error!");
-                        is_correct = false;
-                    }
-                },
+                }
                 Err(e) => {
                     println!("Some error occured! {e}");
                     is_correct = false;
@@ -265,53 +252,40 @@ fn execute_testcases(
         }
     } else {
         match lc.execute_default(&code_file) {
-            Ok(result) => match result {
-                ExecutionResult::Success(result) => {
-                    is_correct = result.is_correct();
-                    result.display();
-                    if !is_correct {
-                        println!(
-                            "{}",
-                            "Testcases can be found in testcase.txt".yellow().italic()
-                        );
+            Ok(result) => {
+                is_correct = match result {
+                    ExecutionResult::Success(result) => {
+                        println!("{}", result);
+                        if !result.is_correct() {
+                            println!(
+                                "{}",
+                                "Testcases can be found in testcase.txt".yellow().italic()
+                            );
+                        }
+                        result.is_correct()
+                    }
+                    ExecutionResult::LimitExceeded(limit_exceeded) => {
+                        println!("{}", limit_exceeded);
+                        false
+                    }
+                    ExecutionResult::CompileError(compile_error) => {
+                        println!("{}", compile_error);
+                        false
+                    }
+                    ExecutionResult::RuntimeError(runtime_error) => {
+                        println!("{}", runtime_error);
+                        false
+                    }
+                    ExecutionResult::PendingResult(state) => {
+                        println!("{}", state);
+                        false
+                    }
+                    ExecutionResult::Unknown(_) => {
+                        println!("Unknown Error!");
+                        false
                     }
                 }
-                ExecutionResult::LimitExceeded(limit_exceeded) => {
-                    println!("{}", limit_exceeded.status_msg);
-                    println!("Time Elapsed : {}", limit_exceeded.elapsed_time);
-                    println!("Memory : {}", limit_exceeded.memory);
-                    is_correct = false;
-                }
-                ExecutionResult::CompileError(compile_error) => {
-                    println!(
-                        "Compile Error!\nError Message : {}\n\nFull error message :\n{}",
-                        compile_error.compile_error, compile_error.full_compile_error
-                    );
-                    is_correct = false;
-                }
-                ExecutionResult::RuntimeError(runtime_error) => {
-                    println!(
-                        "{}\nTestcase {} failed during execution!\n\n{}\n {}\n\n{}\n{}\n\n{}",
-                        "Runtime Error!".red().bold(),
-                        format!("{}", runtime_error.std_output.len()).red(),
-                        "Error Message :".yellow(),
-                        runtime_error.runtime_error,
-                        "Full error message :".yellow(),
-                        runtime_error.full_runtime_error,
-                        format!("Std Output :\n{:?}", runtime_error.std_output)
-                    );
-                    is_correct = false;
-                }
-                ExecutionResult::PendingResult(state) => {
-                    println!("Pending Result!");
-                    println!("State : {:?}", state.state());
-                    is_correct = false;
-                }
-                ExecutionResult::Unknown(_) => {
-                    println!("Unknown Error!");
-                    is_correct = false;
-                }
-            },
+            }
             Err(e) => {
                 println!("Some error occured! {e}");
                 is_correct = false;
