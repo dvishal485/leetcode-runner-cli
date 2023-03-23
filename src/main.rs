@@ -233,8 +233,14 @@ fn execute_testcases(
                     }
                     ExecutionResult::RuntimeError(runtime_error) => {
                         println!(
-                            "Runtime Error!\nError Message : {}\n\nFull error message :\n{}",
-                            runtime_error.runtime_error, runtime_error.full_runtime_error
+                            "{}\nTestcase {} failed during execution!\n\n{}\n {}\n\n{}\n{}\n\n{}",
+                            "Runtime Error!".red().bold(),
+                            format!("{}", runtime_error.std_output.len()).red(),
+                            "Error Message :".yellow(),
+                            runtime_error.runtime_error,
+                            "Full error message :".yellow(),
+                            runtime_error.full_runtime_error,
+                            format!("Std Output :\n{:?}", runtime_error.std_output)
                         );
                         is_correct = false;
                     }
@@ -285,8 +291,14 @@ fn execute_testcases(
                 }
                 ExecutionResult::RuntimeError(runtime_error) => {
                     println!(
-                        "Runtime Error!\nError Message : {}\n\nFull error message :\n{}",
-                        runtime_error.runtime_error, runtime_error.full_runtime_error
+                        "{}\nTestcase {} failed during execution!\n\n{}\n {}\n\n{}\n{}\n\n{}",
+                        "Runtime Error!".red().bold(),
+                        format!("{}", runtime_error.std_output.len()).red(),
+                        "Error Message :".yellow(),
+                        runtime_error.runtime_error,
+                        "Full error message :".yellow(),
+                        runtime_error.full_runtime_error,
+                        format!("Std Output :\n{:?}", runtime_error.std_output)
                     );
                     is_correct = false;
                 }
