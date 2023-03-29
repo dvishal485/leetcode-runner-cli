@@ -80,8 +80,8 @@ fn main() -> ExitCode {
         return ExitCode::FAILURE;
     };
 
-    let mut leetcode = LeetCode::new();
-    let lc = leetcode.authenticate(cookie).unwrap();
+    let lc = LeetCode::new();
+    let lc = lc.authenticate(cookie).unwrap();
 
     if let None = cli.command {
         println!(

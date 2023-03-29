@@ -25,7 +25,7 @@ impl LeetCode {
 impl LeetCode<Unauthorized> {
     /// # Authenticate with cookie
     /// Builds a new reqwest client with the cookie
-    pub fn authenticate(&mut self, cookie: &str) -> Result<LeetCode<Authorized>, &str> {
+    pub fn authenticate(&self, cookie: &str) -> Result<LeetCode<Authorized>, &str> {
         let mut headers = reqwest::header::HeaderMap::with_capacity(5);
         let Some(csrf_token) = cookie
    .split(';')
