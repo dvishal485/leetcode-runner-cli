@@ -73,11 +73,14 @@ pub(crate) struct BoilerPlateCode {
 use super::super::file_parser::language::Language;
 impl BoilerPlateCode {
     pub(crate) fn save_code(&self, filename: &str, title_slug: &str) {
-        let language = Language::from_slug(&self.langSlug).unwrap();
-        let Ok(mut file) = std::fs::File::create(filename) else{
-            eprintln!("Error: Unable to create file");
+        let language = Language::from_slug(&self.langSlug).unwrap_or_else(|| {
+            eprintln!("Error: Unable to identify language of code file!");
             std::process::exit(1);
-        };
+        });
+        let Ok(mut file) = std::fs::File::create(filename) else{
+                eprintln!("Error: Unable to create file");
+                std::process::exit(1);
+            };
         let comment = format!(
             " {} #LCEND https://leetcode.com/problems/{}/",
             language.inline_comment_start(),
@@ -94,12 +97,7 @@ impl BoilerPlateCode {
         }
     }
     pub(crate) fn is_supported(&self) -> bool {
-        let language = Language::from_slug(&self.langSlug);
-        if let Some(_) = language {
-            true
-        } else {
-            false
-        }
+        Language::from_slug(&self.langSlug).is_some()
     }
     pub(crate) fn extension(&self) -> String {
         let language = Language::from_slug(&self.langSlug).unwrap_or_else(|| {
