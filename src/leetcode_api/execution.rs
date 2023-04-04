@@ -120,7 +120,7 @@ impl std::fmt::Display for Success {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let seperator = "-------------------------------";
         let part1 = format!(
-            "{}\n\nOutput   : {:?}\nExpected : {:?}\n",
+            "{}\n\n",
             if self.correct_answer {
                 "Testcase execution success".green().bold()
             } else {
@@ -130,9 +130,7 @@ impl std::fmt::Display for Success {
                 )
                 .red()
                 .bold()
-            },
-            self.code_answer,
-            self.expected_code_answer
+            }
         );
         let mut part2 = Vec::with_capacity(self.code_answer.len());
         for i in 0..self.code_answer.len() {
