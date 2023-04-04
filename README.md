@@ -50,13 +50,17 @@ leetcode-runner-cli [FLAGS] [OPTIONS <option>]
 | `-V, --version`    | Prints version information                          | -                             |
 | `-a, auth`         | Authenticate with leetcode                          | -                             |
 | `-d, daily`        | Fetch daily challenge question                      | -                             |
-| `-q, question`     | Question title to fetch                             | [question_title]              |
+| `-q, question`     | Question title / url to fetch                       | [question_title]              |
 | `-r, run`          | Execute file with default testcases                 | [file_to_run]                 |
 | `-rt, run-custom`  | Execute file with custom testcases                  | [testcase_file] [file_to_run] |
 | `-s, submit`       | Submit solution to leetcode after passing testcases | [file_to_submit]              |
 | `-fs, fast-submit` | Submit solution to leetcode                         | [file_to_submit]              |
 
 ### File changes
+
+If you fetch the question from the CLI (using `-d` or `-q`), then tool will automatically add the required changes in the boiler plate code.
+
+But if you are using your own code, then you need to make the following changes :
 
 The file you submit to leetcode shouldn't have driver code like main function or struct definition. But no need to manually remove it. The tool will automatically remove the driver code and submit the solution to leetcode. All you need to do is put the delimiters `#LCSTART` and `#LCEND` in your solution file in comments, and *place leetcode problem link anywhere* in the file.
 
@@ -65,13 +69,13 @@ For example :
 ```rust
 struct Solution;
 
-// https://leetcode.com/problems/two-sum/ #LCSTART
+// #LCSTART
 
 impl Solution {
     pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
         // real magic here
     }
-} // #LCEND
+} // #LCEND https://leetcode.com/problems/two-sum/ 
 
 fn main() {
  // can have anything which may assist you
@@ -89,6 +93,12 @@ fn main() {
 
     ```bash
     leetcode-runner-cli -q koko-eating-bananas
+    ```
+
+    *OR*
+
+    ```bash
+    leetcode-runner-cli -q https://leetcode.com/problems/koko-eating-bananas/
     ```
 
 - Run src/main.rs with default testcases for question [koko-eating-bananas](https://leetcode.com/problems/koko-eating-bananas/)
