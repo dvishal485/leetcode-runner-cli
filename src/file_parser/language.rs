@@ -115,3 +115,16 @@ impl Language {
         self.to_str().to_string()
     }
 }
+
+impl Language {
+    pub(crate) fn inline_comment_start(&self) -> &str {
+        use Language::*;
+        match self {
+            Rust | Cpp | C | Csharp | Javascript | Typescript | Kotlin | Java | Go | Scala
+            | Swift | Dart => "//",
+            Python3 | Ruby | PHP | Elixir => "#",
+            Racket => ";",
+            Erlang => "%",
+        }
+    }
+}

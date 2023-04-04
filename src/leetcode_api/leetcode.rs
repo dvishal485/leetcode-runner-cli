@@ -209,7 +209,7 @@ impl LeetCode<Authorized> {
         } else {
             input.to_string()
         };
-        boiler_code.save_code(&filename);
+        boiler_code.save_code(&filename, &title_slug);
 
         data.json::<Data>()
             .map_err(|_| "Failed to parse question content!")

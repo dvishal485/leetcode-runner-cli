@@ -65,20 +65,30 @@ pub struct DailyChallenge {
 
 #[derive(Debug, Deserialize)]
 #[allow(non_snake_case)]
-pub struct BoilerPlateCode {
+pub(crate) struct BoilerPlateCode {
     pub(crate) code: String,
     pub(crate) langSlug: String,
 }
 
 use super::super::file_parser::language::Language;
 impl BoilerPlateCode {
-    pub(crate) fn save_code(&self, filename: &str) {
+    pub(crate) fn save_code(&self, filename: &str, title_slug: &str) {
+        let language = Language::from_slug(&self.langSlug).unwrap();
         let Ok(mut file) = std::fs::File::create(filename) else{
             eprintln!("Error: Unable to create file");
             std::process::exit(1);
         };
-        // write code into file
+        let comment = format!(
+            " {} #LCEND https://leetcode.com/problems/{}/",
+            language.inline_comment_start(),
+            title_slug.to_lowercase().trim().replace(" ", "-")
+        );
+        // write code into file along with the comment
         if let Err(_) = std::io::Write::write_all(&mut file, self.code.as_bytes()) {
+            eprintln!("Error: Unable to write code into file");
+            std::process::exit(1);
+        }
+        if let Err(_) = std::io::Write::write_all(&mut file, comment.as_bytes()) {
             eprintln!("Error: Unable to write code into file");
             std::process::exit(1);
         }
