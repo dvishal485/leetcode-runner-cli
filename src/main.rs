@@ -1,4 +1,5 @@
 use crate::file_parser::codefile::CodeFile;
+use crate::leetcode_api::html_opener::open_html;
 use crate::utils::{execute_testcases, submit};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
@@ -120,6 +121,7 @@ fn main() -> ExitCode {
                         let filename = "daily_challenge.html";
                         if let Ok(_) = std::fs::write(filename, question.content) {
                             println!("Saved question as HTML to {}", filename.cyan());
+                            open_html(filename);
                             ExitCode::SUCCESS
                         } else {
                             eprintln!("Error saving question as HTML");
@@ -153,6 +155,7 @@ fn main() -> ExitCode {
                     // save to filename
                     if let Ok(_) = std::fs::write(&filename, question.content) {
                         println!("Saved question as HTML to {}", filename.cyan());
+                        open_html(&filename);
                         ExitCode::SUCCESS
                     } else {
                         eprintln!("Error saving question as HTML");
