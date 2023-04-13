@@ -1,13 +1,13 @@
 use crate::file_parser::codefile::CodeFile;
-use crate::leetcode_api::html_opener::open_html;
+use crate::handlers::html_opener::open_html;
 use crate::utils::{execute_testcases, submit};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
-use leetcode_api::leetcode::LeetCode;
+use handlers::leetcode::LeetCode;
 use std::process::ExitCode;
 
 mod file_parser;
-mod leetcode_api;
+mod handlers;
 mod utils;
 
 #[derive(Parser)]

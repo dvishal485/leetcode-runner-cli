@@ -1,7 +1,7 @@
 use crate::file_parser::codefile::CodeFile;
-use crate::leetcode_api::utils::{ExecutionResult, SubmissionResult};
+use crate::handlers::utils::{ExecutionResult, SubmissionResult};
 use colored::Colorize;
-use crate::leetcode_api::leetcode::{Authorized, LeetCode};
+use crate::handlers::leetcode::{Authorized, LeetCode};
 use std::process::ExitCode;
 
 
