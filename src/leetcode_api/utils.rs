@@ -26,10 +26,11 @@ pub enum ExecutionResult {
     Unknown(Unknown),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum PendingState {
     Pending,
     Started,
+    Success,
     Unknown,
 }
 
@@ -54,6 +55,7 @@ impl PendingResult {
         match self.state.as_str() {
             "PENDING" => PendingState::Pending,
             "STARTED" => PendingState::Started,
+            "SUCCESS" => PendingState::Success,
             unknown_state => {
                 println!(
                     "Unknown state : {}\nKindly inform about this to the developer",

@@ -304,7 +304,7 @@ impl LeetCode<Authorized> {
 
         let interpret_id = data.interpret_id;
         println!("Executing testcases...");
-        let mut last_state = 0;
+        let mut last_state = PendingState::Unknown;
         loop {
             let url = format!("https://leetcode.com/submissions/detail/{interpret_id}/check/");
             // std::thread::sleep(std::time::Duration::from_secs(7));
@@ -317,29 +317,32 @@ impl LeetCode<Authorized> {
   };
             match data {
                 ExecutionResult::PendingResult(data) => {
-                    last_state = match data.state.as_str() {
-                        "PENDING" => {
-                            if last_state == 0 {
-                                println!("Status : Pending");
+                    let curr_state = data.state();
+                    match curr_state {
+                        PendingState::Pending => {
+                            if last_state != PendingState::Pending {
+                                println!("Status : Evalutaion Pending");
                             }
-                            1
                         }
-                        "STARTED" => {
-                            if last_state == 1 {
+                        PendingState::Started => {
+                            if last_state != PendingState::Started {
                                 println!("Status : Execution Started");
                             }
-                            2
                         }
-                        _ => {
-                            if last_state == 2 {
-                                println!(
-                                    "Status : {}\nKindly report this state to developer",
-                                    data.state.as_str()
-                                );
-                            }
-                            3
+                        PendingState::Success => {
+                            println!("Your code was executed successfully but we failed to parse result\nCheck on leetcode manually");
+                            std::process::exit(1);
+                        }
+                        PendingState::Unknown => {
+                            println!(
+                                "Status : {}\nKindly report this state to developer",
+                                data.state.as_str()
+                            );
+                            std::process::exit(1);
                         }
                     };
+                    last_state = curr_state;
+
                     continue;
                 }
                 data => return Ok(data),
@@ -385,7 +388,7 @@ impl LeetCode<Authorized> {
    };
         println!("Evaluating solution...");
         let submission_id = data.submission_id;
-        let mut last_state = 0;
+        let mut last_state = PendingState::Unknown;
 
         loop {
             let url = format!("https://leetcode.com/submissions/detail/{submission_id}/check/");
@@ -398,29 +401,31 @@ impl LeetCode<Authorized> {
   };
             match data {
                 SubmissionResult::PendingResult(data) => {
-                    last_state = match data.state.as_str() {
-                        "PENDING" => {
-                            if last_state == 0 {
+                    let curr_state = data.state();
+                    match curr_state {
+                        PendingState::Pending => {
+                            if last_state != PendingState::Pending {
                                 println!("Status : Evalutaion Pending");
                             }
-                            1
                         }
-                        "STARTED" => {
-                            if last_state == 1 {
+                        PendingState::Started => {
+                            if last_state != PendingState::Started {
                                 println!("Status : Execution Started");
                             }
-                            2
                         }
-                        _ => {
-                            if last_state == 2 {
-                                println!(
-                                    "Status : {}\nKindly report this state to developer",
-                                    data.state.as_str()
-                                );
-                            }
-                            3
+                        PendingState::Success => {
+                            println!("Your code was executed successfully but we failed to parse result\nCheck on leetcode manually");
+                            std::process::exit(1);
+                        }
+                        PendingState::Unknown => {
+                            println!(
+                                "Status : {}\nKindly report this state to developer",
+                                data.state.as_str()
+                            );
+                            std::process::exit(1);
                         }
                     };
+                    last_state = curr_state;
                     continue;
                 }
                 data => return Ok(data),
