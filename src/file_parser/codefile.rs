@@ -49,7 +49,7 @@ impl CodeFile {
             std::process::exit(1);
         };
 
-        let parsed_file = Self::parse_code(&code);
+        let parsed_file = Self::parse_code(&code, code_file.language);
         let Ok((question_title, parsed_code)) = parsed_file else{
             eprintln!("Error parsing the code file!\n{}", parsed_file.unwrap_err());
             std::process::exit(1);
@@ -75,7 +75,7 @@ impl CodeFile {
         ))
     }
 
-    fn parse_code(code: &str) -> Result<(String, String), &str> {
+    fn parse_code(code: &str, language: Language) -> Result<(String, String), &str> {
         let question_title: String;
         let parsed_code: String;
         let start = code
@@ -94,7 +94,9 @@ impl CodeFile {
         } else {
             return Err("No leetcode problem found in the code file. Please add the problem link in the code file using comments.");
         }
-        parsed_code = code[start..end].to_string();
+        let code = code[start..end].trim();
+        let code = code.trim_end_matches(language.inline_comment_start());
+        parsed_code = code.to_string();
 
         Ok((question_title, parsed_code))
     }
@@ -110,7 +112,7 @@ impl CodeFile {
             eprintln!("Error while reading file {}!", path.display());
             std::process::exit(1);
         };
-        let parsed_file = Self::parse_code(&code);
+        let parsed_file = Self::parse_code(&code, valid_file.language);
         let Ok((question_title, parsed_code)) = parsed_file else{
             eprintln!("Error parsing the code file!\n{}", parsed_file.unwrap_err());
             std::process::exit(1);
