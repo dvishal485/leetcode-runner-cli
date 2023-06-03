@@ -95,7 +95,7 @@ impl CodeFile {
             return Err("No leetcode problem found in the code file. Please add the problem link in the code file using comments.");
         }
         let code = code[start..end].trim();
-        let code = code.trim_end_matches(language.inline_comment_start());
+        let code = code.trim_end_matches(language.inline_comment_start()).trim_end();
         parsed_code = code.to_string();
 
         Ok((question_title, parsed_code))
