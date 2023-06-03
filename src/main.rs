@@ -20,47 +20,47 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Authenticate with LeetCode [ -a ]
-    #[command(alias = "-a")]
+    /// Authenticate with LeetCode
+    #[command(visible_alias = "-a")]
     Auth,
-    /// Executes code with testcases [ -r ]
-    #[command(alias = "-rt")]
+    /// Executes code with testcases
+    #[command(visible_alias = "-rt")]
     RunCustom {
         /// Testcases to run
         testcases: String,
         /// File to execute
         filename: Option<String>,
     },
-    #[command(alias = "-r")]
+    #[command(visible_alias = "-r")]
     Run {
         /// File to execute with default testcases
         filename: Option<String>,
     },
-    /// Submits code to LeetCode [ -s ]
-    #[command(alias = "-fs")]
+    /// Submits code to LeetCode
+    #[command(visible_alias = "-fs")]
     FastSubmit {
         /// File to submit
         filename: Option<String>,
     },
-    #[command(alias = "-s")]
+    #[command(visible_alias = "-s")]
     Submit {
         /// File to submit
         filename: Option<String>,
     },
-    /// Save a question as HTML [ -q ]
-    #[command(alias = "-q")]
+    /// Save a question as HTML
+    #[command(visible_alias = "-q")]
     Question {
         /// Question name
         question_name: String,
     },
-    /// Save today's daily challenge as HTML [ -d ]
-    #[command(alias = "-d")]
+    /// Save today's daily challenge as HTML
+    #[command(visible_alias = "-d")]
     DailyChallenge,
 }
 
 #[derive(Subcommand)]
 enum Execute {
-    #[command(alias = "-t")]
+    #[command(visible_alias = "-t")]
     Testcases {
         /// File to run
         filename: Option<String>,
