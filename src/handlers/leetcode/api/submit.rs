@@ -28,16 +28,16 @@ impl LeetCode<Authorized> {
             typed_code,
         };
         let Ok(data)= client.post(&url).json(&submission).send() else {
- return Err("Failed to parse arguments");
-   };
+            return Err("Failed to parse arguments");
+        };
         #[derive(Debug, Deserialize)]
         struct SubmissionID {
             submission_id: u32,
         }
         // println!("{}", data.text().unwrap());
         let Ok(data) = data.json::<SubmissionID>() else {
- return Err("Failed to fetch submission id from leetcode! Check your submissions manually on leetcode");
-   };
+            return Err("Failed to fetch submission id from leetcode! Check your submissions manually on leetcode");
+        };
         println!("Evaluating solution...");
         let submission_id = data.submission_id;
         let mut last_state = PendingState::Unknown;
@@ -45,19 +45,19 @@ impl LeetCode<Authorized> {
         loop {
             let url = format!("https://leetcode.com/submissions/detail/{submission_id}/check/");
             let Ok(data) = client.get(&url).send() else {
- return Err("Failed to parse arguments!");
-   };
+                return Err("Failed to parse arguments!");
+            };
 
             let Ok(data) = data.json::<SubmissionResult>() else  {
-  return Err("Failed to fetch from leetcode! Try again after sometime or renew cookie");
-  };
+                return Err("Failed to fetch from leetcode! Try again after sometime or renew cookie");
+            };
             match data {
                 SubmissionResult::PendingResult(data) => {
                     let curr_state = data.state();
                     match curr_state {
                         PendingState::Pending => {
                             if last_state != PendingState::Pending {
-                                println!("Status : Evalutaion Pending");
+                                println!("Status : Evaluation Pending");
                             }
                         }
                         PendingState::Started => {

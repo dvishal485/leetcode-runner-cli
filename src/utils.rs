@@ -9,7 +9,7 @@ pub(crate) fn execute_testcases(
     filename: Option<String>,
     testcases: Option<String>,
     lc: &LeetCode<Authorized>,
-) -> (bool, CodeFile) {
+    ) -> (bool, CodeFile) {
     let is_correct;
     let code_file: CodeFile;
     if let Some(filename) = filename {
@@ -69,7 +69,7 @@ pub(crate) fn execute_testcases(
                             println!(
                                 "{}",
                                 "Testcases can be found in testcase.txt".yellow().italic()
-                            );
+                                );
                         }
                         result.is_correct()
                     }

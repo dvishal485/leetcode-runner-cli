@@ -55,11 +55,11 @@ impl LeetCode<Authorized> {
             data_input,
         };
         let Ok(data)= client.post(&url).json(&testcase).send() else {
- return Err("Failed to parse arguments!");
-   };
+            return Err("Failed to parse arguments!");
+        };
         let Ok(data) = data.json::<InterpretID>() else{
- return Err("Failed to parse JSON from leetcode! Try again after sometime or renew cookie");
-   };
+            return Err("Failed to parse JSON from leetcode! Try again after sometime or renew cookie");
+        };
 
         let interpret_id = data.interpret_id;
         println!("Executing testcases...");
@@ -68,12 +68,12 @@ impl LeetCode<Authorized> {
             let url = format!("https://leetcode.com/submissions/detail/{interpret_id}/check/");
             // std::thread::sleep(std::time::Duration::from_secs(7));
             let Ok(data) = client.get(&url).send() else {
- return Err("Failed to parse arguments!");
-   };
+                return Err("Failed to parse arguments!");
+            };
 
             let Ok(data) = data.json::<ExecutionResult>() else  {
-  return Err("Failed to parse JSON from leetcode! Try again after sometime or renew cookie");
-  };
+                return Err("Failed to parse JSON from leetcode! Try again after sometime or renew cookie");
+            };
             match data {
                 ExecutionResult::PendingResult(data) => {
                     let curr_state = data.state();

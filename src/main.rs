@@ -89,7 +89,7 @@ fn main() -> ExitCode {
         println!(
             "🪛 {}\nExecute and submit code on LeetCode directly from your terminal!\n\nUsage : {}",
             "Leetcode Runner CLI Tool".bold().yellow(),
-            "leetcode-cli -h".cyan().italic()
+            "leetcode-runner-cli -h".cyan().italic()
         );
         ExitCode::SUCCESS
     } else {

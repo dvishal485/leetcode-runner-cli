@@ -7,10 +7,10 @@ impl LeetCode<Authorized> {
         let query = GraphqlRequest {
             query: "\n query questionOfToday {\n  activeDailyCodingChallengeQuestion {\n date\n userStatus\n link\n question {\n   acRate\n   difficulty\n   freqBar\n   frontendQuestionId: questionFrontendId\n   isFavor\n   paidOnly: isPaidOnly\n   status\n   title\n   titleSlug\n   hasVideoSolution\n   hasSolution\n   topicTags {\n  name\n  id\n  slug\n   }\n }\n  }\n}\n ".to_string(),
             variables: "{}".to_string(),
-  };
+        };
         let Ok(data) = client.post(url).json(&query).send() else {
- return Err("Failed to fetch daily challenge from leetcode!");
-   };
+            return Err("Failed to fetch daily challenge from leetcode!");
+        };
         // println!("{:?}", data.text());
         // todo!();
         #[derive(Deserialize)]
@@ -32,10 +32,10 @@ impl LeetCode<Authorized> {
     pub fn get_metadata(&self) -> Result<UserMetadata, &str> {
         let client = &self.client;
         let Ok(data) = client
-   .get("https://leetcode.com/api/problems/all/")
-   .send() else {
- return Err("Failed to fetch metadata from leetcode!");
-   };
+            .get("https://leetcode.com/api/problems/all/")
+            .send() else {
+                return Err("Failed to fetch metadata from leetcode!");
+            };
 
         let metadata = data
             .json::<UserMetadata>()
@@ -52,13 +52,13 @@ impl LeetCode<Authorized> {
         let client = &self.client;
         let url = "https://leetcode.com/graphql";
         let query = GraphqlRequest {
-   query:  "query questionContent($titleSlug: String!) { question(titleSlug: $titleSlug) { content mysqlSchemas }}".to_string(),
-   variables: serde_json::to_string(&Variables { titleSlug: title_slug.to_string() }).unwrap(),
-  };
+            query:  "query questionContent($titleSlug: String!) { question(titleSlug: $titleSlug) { content mysqlSchemas }}".to_string(),
+            variables: serde_json::to_string(&Variables { titleSlug: title_slug.to_string() }).unwrap(),
+        };
 
         let Ok(data) = client.post(url).json(&query).send() else {
- return Err("Failed to fetch question id from leetcode!");
-   };
+            return Err("Failed to fetch question id from leetcode!");
+        };
         #[derive(Deserialize)]
         struct QuestionWrapper {
             question: LeetcodeQuestion,
@@ -80,9 +80,9 @@ impl LeetCode<Authorized> {
                 query: query.to_string(),
                 variables: varibales,
             })
-            .send() else {
+        .send() else {
             return Err("Failed to fetch boiler plate code!");
-            };
+        };
 
         #[derive(Debug, Deserialize)]
         #[allow(non_snake_case)]
@@ -161,12 +161,12 @@ impl LeetCode<Authorized> {
         let url = "https://leetcode.com/graphql";
 
         let query = GraphqlRequest {
-   query: "\n query consolePanelConfig($titleSlug: String!) {\n question(titleSlug: $titleSlug) {\n questionId\n questionFrontendId\n questionTitle\n enableDebugger\n enableRunCode\n enableSubmit\n enableTestMode\n exampleTestcaseList\n metaData\n }\n}\n".to_string(),
-   variables: serde_json::to_string(&Variables { titleSlug: title_slug.to_string() }).unwrap(),
-  };
+            query: "\n query consolePanelConfig($titleSlug: String!) {\n question(titleSlug: $titleSlug) {\n questionId\n questionFrontendId\n questionTitle\n enableDebugger\n enableRunCode\n enableSubmit\n enableTestMode\n exampleTestcaseList\n metaData\n }\n}\n".to_string(),
+            variables: serde_json::to_string(&Variables { titleSlug: title_slug.to_string() }).unwrap(),
+        };
         let Ok(data) = client.post(url).json(&query).send() else {
- return Err("Failed to fetch question id from leetcode!");
-   };
+            return Err("Failed to fetch question id from leetcode!");
+        };
 
         #[derive(Debug, Deserialize)]
         struct QuestionWrapper {

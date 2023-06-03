@@ -53,7 +53,7 @@ impl CodeFile {
         let Ok((question_title, parsed_code)) = parsed_file else{
             eprintln!("Error parsing the code file!\n{}", parsed_file.unwrap_err());
             std::process::exit(1);
-                    };
+        };
         code_file.question_title = question_title;
         code_file.code = parsed_code;
         code_file
@@ -65,14 +65,14 @@ impl CodeFile {
         let language = Language::from_str(extension)?;
 
         Some((
-            file_name,
-            CodeFile {
-                language,
-                path: path.clone(),
-                question_title: String::new(),
-                code: String::new(),
-            },
-        ))
+                file_name,
+                CodeFile {
+                    language,
+                    path: path.clone(),
+                    question_title: String::new(),
+                    code: String::new(),
+                },
+                ))
     }
 
     fn parse_code(code: &str, language: Language) -> Result<(String, String), &str> {
