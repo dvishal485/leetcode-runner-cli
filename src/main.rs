@@ -44,9 +44,15 @@ fn main() -> Result<()> {
         }
         Some(Commands::Question { question_name }) => {
             let question_name = if let Some(idx) = question_name.find("leetcode.com/problems/") {
-                let problem = (&question_name[idx..]).split_whitespace().next().unwrap();
-                let problem = problem.split('/').skip(2).next().unwrap();
-                problem
+                let question_title = question_name[idx..]
+                    .split_whitespace()
+                    .next()
+                    .expect("Should be Some since the find method succeed")
+                    .split('/')
+                    .skip(2)
+                    .next()
+                    .ok_or_else(|| eyre::eyre!("Invalid link, expected question identifier"))?;
+                question_title
             } else {
                 &question_name
             };

@@ -7,7 +7,34 @@ impl LeetCode<Authorized> {
         let url = "https://leetcode.com/graphql";
         let client = &self.client;
         let query = GraphqlRequest {
-            query: "\n query questionOfToday {\n  activeDailyCodingChallengeQuestion {\n date\n userStatus\n link\n question {\n   acRate\n   difficulty\n   freqBar\n   frontendQuestionId: questionFrontendId\n   isFavor\n   paidOnly: isPaidOnly\n   status\n   title\n   titleSlug\n   hasVideoSolution\n   hasSolution\n   topicTags {\n  name\n  id\n  slug\n   }\n }\n  }\n}\n ".to_string(),
+            query: r#"
+            query questionOfToday {
+                activeDailyCodingChallengeQuestion {
+                    date
+                    userStatus
+                    link
+                    question {
+                        acRate
+                        difficulty
+                        freqBar
+                        frontendQuestionId: questionFrontendId
+                        isFavor
+                        paidOnly: isPaidOnly
+                        status
+                        title
+                        titleSlug
+                        hasVideoSolution
+                        hasSolution
+                        topicTags {
+                            name
+                            id
+                            slug
+                        }
+                    }
+                }
+            }
+            "#
+            .to_string(),
             variables: "{}".to_string(),
         };
 
@@ -52,8 +79,17 @@ impl LeetCode<Authorized> {
         let client = &self.client;
         let url = "https://leetcode.com/graphql";
         let query = GraphqlRequest {
-            query:  "query questionContent($titleSlug: String!) { question(titleSlug: $titleSlug) { content mysqlSchemas }}".to_string(),
-            variables: serde_json::to_string(&Variables { titleSlug: title_slug.to_string() }).unwrap(),
+            query: r#"
+            query questionContent($titleSlug: String!) {
+                question(titleSlug: $titleSlug) {
+                    content mysqlSchemas
+                }
+            }
+            "#
+            .to_string(),
+            variables: serde_json::to_string(&Variables {
+                titleSlug: title_slug.to_string(),
+            })?,
         };
 
         let data = client.post(url).json(&query).send()?;
@@ -67,7 +103,21 @@ impl LeetCode<Authorized> {
             data: QuestionWrapper,
         }
 
-        let query = "\n query questionEditorData($titleSlug: String!) {\n  question(titleSlug: $titleSlug) {\n questionId\n questionFrontendId\n codeSnippets {\n   lang\n   langSlug\n   code\n }\n envInfo\n enableRunCode\n  }\n}\n ";
+        let query = r#"
+        query questionEditorData($titleSlug: String!) {
+            question(titleSlug: $titleSlug) {
+                questionId
+                questionFrontendId
+                codeSnippets {
+                    lang
+                    langSlug
+                    code
+                }
+                envInfo
+                enableRunCode
+            }
+        }
+        "#;
         let varibales = serde_json::to_string(&Variables {
             titleSlug: title_slug.to_string(),
         })?;
@@ -121,15 +171,15 @@ impl LeetCode<Authorized> {
         };
 
         let mut input = String::new();
-        println!("Filename (main.{}) : ", &(boiler_code.extension()));
+        println!("Filename (main.{}) : ", &(boiler_code.extension()?));
         std::io::stdin().read_line(&mut input)?;
         let input = input.trim();
         let filename = if input.is_empty() {
-            format!("main.{}", boiler_code.extension())
+            format!("main.{}", boiler_code.extension()?)
         } else {
             input.to_string()
         };
-        boiler_code.save_code(&filename, &title_slug);
+        boiler_code.save_code(&filename, &title_slug)?;
 
         Ok(data.json::<Data>().map(|op| op.data.question)?)
     }
@@ -139,8 +189,25 @@ impl LeetCode<Authorized> {
         let url = "https://leetcode.com/graphql";
 
         let query = GraphqlRequest {
-            query: "\n query consolePanelConfig($titleSlug: String!) {\n question(titleSlug: $titleSlug) {\n questionId\n questionFrontendId\n questionTitle\n enableDebugger\n enableRunCode\n enableSubmit\n enableTestMode\n exampleTestcaseList\n metaData\n }\n}\n".to_string(),
-            variables: serde_json::to_string(&Variables { titleSlug: title_slug.to_string() }).unwrap(),
+            query: r#"
+            query consolePanelConfig($titleSlug: String!) {
+                question(titleSlug: $titleSlug) {
+                    questionId
+                    questionFrontendId
+                    questionTitle
+                    enableDebugger
+                    enableRunCode
+                    enableSubmit
+                    enableTestMode
+                    exampleTestcaseList
+                    metaData
+                }
+            }
+            "#
+            .to_string(),
+            variables: serde_json::to_string(&Variables {
+                titleSlug: title_slug.to_string(),
+            })?,
         };
         let data = client
             .post(url)

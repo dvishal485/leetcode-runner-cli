@@ -34,7 +34,9 @@ impl LeetCode<Authorized> {
             question_id,
             typed_code,
         };
-        let data = client.post(&url).json(&submission).send()?.json::<SubmissionID>().wrap_err("Failed to fetch submission id from LeetCode, Check your submissions manually on leetcode")?;
+        let data = client.post(&url).json(&submission).send()?.json::<SubmissionID>().wrap_err(
+            "Failed to fetch submission id from LeetCode, Check your submissions manually on leetcode"
+        )?;
 
         println!("Evaluating solution...");
         let submission_id = data.submission_id;
