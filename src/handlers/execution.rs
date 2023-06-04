@@ -197,7 +197,4 @@ impl Success {
     pub fn is_correct(&self) -> bool {
         self.correct_answer
     }
-    pub fn display(&self) {
-        println!("{}", self);
-    }
 }

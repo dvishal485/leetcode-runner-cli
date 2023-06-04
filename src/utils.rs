@@ -24,7 +24,7 @@ pub(crate) fn execute_testcases<P: AsRef<Path>>(
 
             match lc.execute(&code_file, data_input)? {
                 ExecutionResult::Success(result) => {
-                    result.display();
+                    println!("{}", result);
                     return Ok((result.is_correct(), code_file));
                 }
                 ExecutionResult::LimitExceeded(limit_exceeded) => {
@@ -40,14 +40,14 @@ pub(crate) fn execute_testcases<P: AsRef<Path>>(
                     bail!(pending.state);
                 }
                 ExecutionResult::Unknown(_) => {
-                    bail!("Unknown error");
+                    bail!("Unknown");
                 }
             }
         }
         None => {
             match lc.execute_default(&code_file)? {
                 ExecutionResult::Success(result) => {
-                    result.display();
+                    println!("{}", result);
                     // if !result.is_correct() {
                     //     println!(
                     //         "{}",

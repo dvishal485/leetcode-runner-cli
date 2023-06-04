@@ -61,7 +61,7 @@ impl fmt::Display for SubmissionResult {
             SubmissionResult::Wrong(inner) => write!(f, "{}", inner),
             SubmissionResult::LimitExceeded(inner) => write!(f, "{}", inner),
             SubmissionResult::PendingResult(inner) => write!(f, "{}", inner),
-            SubmissionResult::Unknown(inner) => write!(f, "Unknown"),
+            SubmissionResult::Unknown(_) => write!(f, "Unknown"),
         }
     }
 }
