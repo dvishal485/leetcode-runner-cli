@@ -134,7 +134,8 @@ impl std::fmt::Display for Success {
         for i in 0..self.code_answer.len() {
             let is_correct = self.code_answer[i] == self.expected_code_answer[i];
             part2.push(format!(
-                "{}\n{}\n{}\nOutput   : {:?}\nExpected : {:?}\n\n{}",
+                "{1}\n{2}\n{3}\n{0:10}: {4:?}\n{7:10}: {5:?}\n\n{6}",
+                "Output",
                 seperator.yellow(),
                 if is_correct {
                     format!("Testcase {} execution success", i + 1).green()
@@ -148,24 +149,43 @@ impl std::fmt::Display for Success {
                     format!("Std Output :\n{}\n", self.std_output[i])
                 } else {
                     String::new()
-                }
+                },
+                "Expected"
             ));
         }
 
+        let may_tle = {
+            // added 200 because leetcode data is not very reliabale
+            self.expected_elapsed_time + 200 < self.elapsed_time
+        };
+
         let part3 = format!(
-            "{}\nRuntime  : {}\nOutput   : {}\nExpected : {}\n",
+            "{}\n{:10}: {:6} ({}%)\n{}",
             seperator.yellow(),
+            "Runtime",
             self.status_runtime.cyan(),
-            self.elapsed_time,
-            self.expected_status_runtime
+            100 - (self.elapsed_time as u128 * 100)
+                .checked_div(self.expected_elapsed_time as u128 + 100)
+                .unwrap_or(100)
+                .min(100),
+            if may_tle {
+                "High runtime detected! May lead to TLE\n"
+                    .red()
+                    .italic()
+                    .to_string()
+            } else {
+                "".to_string()
+            },
         );
 
         let part4 = format!(
-            "{}\nMemory   : {}\nOutput   : {}\nExpected : {}\n",
-            seperator.yellow(),
+            "{2:10}: {:6} ({}%)\n",
             self.status_memory.cyan(),
-            self.memory,
-            self.expected_memory
+            100 - (self.memory as u128 * 100)
+                .checked_div(self.expected_memory as u128)
+                .unwrap_or(100)
+                .min(100),
+            "Memory",
         );
         write!(f, "{}{}{}{}", part1, part2.join(""), part3, part4)
     }

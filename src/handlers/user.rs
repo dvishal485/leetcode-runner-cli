@@ -17,9 +17,19 @@ impl UserMetadata {
 
 impl std::fmt::Display for UserMetadata {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,
-            "User name        :\t{}\nQuestions Solved :\n\t- Easy   :\t{}\n\t- Medium :\t{}\n\t- Hard   :\t{}",
-            self.user_name, self.ac_easy, self.ac_medium, self.ac_hard
+        write!(
+            f,
+            "{:18}:{:>15}\n{qs:18}:\n{empty:8}{easy:10}:{ec:>15}\n{empty:8}{med:10}:{mc:>15}\n{empty:8}{hard:10}:{hc:>15}",
+            "Username",
+            self.user_name,
+            ec = self.ac_easy,
+            mc = self.ac_medium,
+            hc = self.ac_hard,
+            qs = "Questions Solved",
+            easy = "- Easy",
+            med = "- Medium",
+            hard = "- Hard",
+            empty = ""
         )
     }
 }

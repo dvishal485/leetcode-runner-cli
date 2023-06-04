@@ -141,9 +141,13 @@ impl std::fmt::Display for SubmitCorrect {
         let seperator = "-------------------------------";
         write!(
             f,
-            "\n{seperator}\n{}\n{seperator}\nStatus   : {}\nLanguage : {}\nRuntime  : {}\t( beats {:.2}% )\nMemory   : {}\t( beats {:.2}% )\n",
+            "\n{seperator}\n{}\n{seperator}\n{status:10}: {}\n{lang:10}: {}\n{rt:10}: {:6}\t( beats {:.2}% )\n{mem:10}: {:6}\t( beats {:.2}% )\n",
             "Submission Correct!".green().bold(),
-            self.status_msg, self.lang, self.status_runtime.cyan(),self.runtime_percentile, self.status_memory.cyan(), self.memory_percentile
+            self.status_msg, self.lang, self.status_runtime.cyan(),self.runtime_percentile, self.status_memory.cyan(), self.memory_percentile,
+            status = "Status",
+            lang = "Language",
+            rt = "Runtime",
+            mem = "Memory"
         )
     }
 }
