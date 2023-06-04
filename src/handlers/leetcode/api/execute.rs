@@ -80,7 +80,7 @@ impl LeetCode<Authorized> {
                     match curr_state {
                         PendingState::Pending => {
                             if last_state != PendingState::Pending {
-                                println!("Status : Evalutaion Pending");
+                                println!("Status : Evaluation Pending");
                             }
                         }
                         PendingState::Started => {

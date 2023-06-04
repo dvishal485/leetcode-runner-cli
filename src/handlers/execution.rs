@@ -132,7 +132,7 @@ impl std::fmt::Display for Success {
         );
         let mut part2 = Vec::with_capacity(self.code_answer.len());
         for i in 0..self.code_answer.len() {
-            let is_correct = self.code_answer[i] == self.expected_code_answer[i];
+            let is_correct = self.compare_result.chars().nth(i).unwrap_or('0') == '1';
             part2.push(format!(
                 "{1}\n{2}\n{3}\n{0:10}: {4:?}\n{7:10}: {5:?}\n\n{6}",
                 "Output",

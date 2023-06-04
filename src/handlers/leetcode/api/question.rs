@@ -59,11 +59,11 @@ impl LeetCode<Authorized> {
         let Ok(data) = client.post(url).json(&query).send() else {
             return Err("Failed to fetch question id from leetcode!");
         };
+
         #[derive(Deserialize)]
         struct QuestionWrapper {
             question: LeetcodeQuestion,
         }
-
         #[derive(Deserialize)]
         struct Data {
             data: QuestionWrapper,
@@ -80,7 +80,8 @@ impl LeetCode<Authorized> {
                 query: query.to_string(),
                 variables: varibales,
             })
-        .send() else {
+            .send()
+        else {
             return Err("Failed to fetch boiler plate code!");
         };
 
