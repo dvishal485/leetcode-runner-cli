@@ -4,17 +4,16 @@ use crate::handlers::utils::{ExecutionResult, SubmissionResult};
 
 use eyre::{bail, Result};
 
-use std::process::ExitCode;
-
+/// The first element of the return tuple indicates whether the answer is correct.
 pub(crate) fn execute_testcases(
     filename: Option<String>,
     testcases: Option<String>,
     lc: &LeetCode<Authorized>,
 ) -> Result<(bool, CodeFile)> {
     let code_file = if let Some(path) = filename {
-        CodeFile::from_file(&path)
+        CodeFile::from_file(&path)?
     } else {
-        CodeFile::from_dir()
+        CodeFile::from_dir()?
     };
 
     match testcases {

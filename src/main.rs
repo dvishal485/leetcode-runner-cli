@@ -70,9 +70,9 @@ fn main() -> Result<()> {
         }
         Some(Commands::FastSubmit { filename }) => {
             let code_file = if let Some(path) = filename {
-                CodeFile::from_file(&path)
+                CodeFile::from_file(&path)?
             } else {
-                CodeFile::from_dir()
+                CodeFile::from_dir()?
             };
 
             submit(&lc, code_file)?;
