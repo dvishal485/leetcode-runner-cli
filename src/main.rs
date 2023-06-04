@@ -65,15 +65,15 @@ fn main() -> Result<()> {
         }
         Some(Commands::RunCustom {
             testcases,
-            filename,
+            file: filename,
         }) => {
             _ = execute_testcases(filename, Some(&testcases), &lc)?;
             // bail if `is_correct == false`?
         }
-        Some(Commands::Run { filename }) => {
-            _ = execute_testcases(filename, None, &lc)?;
+        Some(Commands::Run { file }) => {
+            _ = execute_testcases(file, None, &lc)?;
         }
-        Some(Commands::FastSubmit { filename }) => {
+        Some(Commands::FastSubmit { file: filename }) => {
             let code_file = if let Some(path) = filename {
                 CodeFile::from_file(&path)?
             } else {
@@ -82,7 +82,7 @@ fn main() -> Result<()> {
 
             submit(&lc, code_file)?;
         }
-        Some(Commands::Submit { filename }) => {
+        Some(Commands::Submit { file: filename }) => {
             let (is_correct, code_file) = execute_testcases(filename, None, &lc)?;
             if is_correct {
                 submit(&lc, code_file)?;

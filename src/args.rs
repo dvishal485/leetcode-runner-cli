@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -18,24 +20,28 @@ pub enum Commands {
     RunCustom {
         /// Testcases to run
         testcases: String,
+        #[arg(value_name = "PATH")]
         /// File to execute
-        filename: Option<String>,
+        file: Option<PathBuf>,
     },
     #[command(visible_alias = "-r")]
     Run {
+        #[arg(value_name = "PATH")]
         /// File to execute with default testcases
-        filename: Option<String>,
+        file: Option<PathBuf>,
     },
     /// Submits code to LeetCode
     #[command(visible_alias = "-fs")]
     FastSubmit {
+        #[arg(value_name = "PATH")]
         /// File to submit
-        filename: Option<String>,
+        file: Option<PathBuf>,
     },
     #[command(visible_alias = "-s")]
     Submit {
+        #[arg(value_name = "PATH")]
         /// File to submit
-        filename: Option<String>,
+        file: Option<PathBuf>,
     },
     /// Save a question as HTML
     #[command(visible_alias = "-q")]
@@ -52,8 +58,9 @@ pub enum Commands {
 pub enum Execute {
     #[command(visible_alias = "-t")]
     Testcases {
+        #[arg(value_name = "PATH")]
         /// File to run
-        filename: Option<String>,
+        file: Option<PathBuf>,
         /// Testcases to run
         testcases: Option<String>,
     },
