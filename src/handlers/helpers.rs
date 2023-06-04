@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use colored::Colorize;
 use eyre::Result;
 use serde::{Deserialize, Serialize};
@@ -74,8 +76,7 @@ pub(crate) struct BoilerPlateCode {
 use super::super::file_parser::language::Language;
 impl BoilerPlateCode {
     pub(crate) fn save_code(&self, filename: &str, title_slug: &str) -> Result<()> {
-        let language = Language::from_slug(&self.langSlug)
-            .ok_or_else(|| eyre::eyre!("Unable to identify language of code file!"))?;
+        let language = Language::from_str(&self.langSlug)?;
         let mut file = std::fs::File::create(filename)?;
         let comment = format!(
             " {} #LCEND https://leetcode.com/problems/{}/",
@@ -90,11 +91,10 @@ impl BoilerPlateCode {
         Ok(())
     }
     pub(crate) fn is_supported(&self) -> bool {
-        Language::from_slug(&self.langSlug).is_some()
+        Language::from_str(&self.langSlug).is_ok()
     }
     pub(crate) fn extension(&self) -> Result<String> {
-        let language = Language::from_slug(&self.langSlug)
-            .ok_or_else(|| eyre::eyre!("Unable to identify language of code file!"))?;
+        let language = Language::from_str(&self.langSlug)?;
         Ok(language.extension().to_owned())
     }
 }

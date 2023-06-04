@@ -1,7 +1,7 @@
 use eyre::Result;
 
 use super::language::*;
-use std::path::PathBuf;
+use std::{path::PathBuf, str::FromStr};
 
 pub struct CodeFile {
     pub language: Language,
@@ -63,7 +63,7 @@ impl CodeFile {
     fn is_valid_file<'a>(path: &'a std::path::PathBuf) -> Option<(&'a str, Self)> {
         let file_name = path.file_name().and_then(|filename| filename.to_str())?;
         let extension = path.extension().and_then(|ext| ext.to_str())?;
-        let language = Language::from_str(extension)?;
+        let language = Language::from_str(extension).ok()?;
 
         Some((
             file_name,
