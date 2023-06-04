@@ -1,15 +1,14 @@
 use crate::file_parser::codefile::CodeFile;
+use crate::handlers::leetcode::{Authorized, LeetCode};
 use crate::handlers::utils::{ExecutionResult, SubmissionResult};
 use colored::Colorize;
-use crate::handlers::leetcode::{Authorized, LeetCode};
 use std::process::ExitCode;
-
 
 pub(crate) fn execute_testcases(
     filename: Option<String>,
     testcases: Option<String>,
     lc: &LeetCode<Authorized>,
-    ) -> (bool, CodeFile) {
+) -> (bool, CodeFile) {
     let is_correct;
     let code_file: CodeFile;
     if let Some(filename) = filename {
@@ -20,7 +19,7 @@ pub(crate) fn execute_testcases(
     if let Some(testcases) = testcases {
         let Ok(data_input) = std::fs::read_to_string(&testcases) else{
             eprintln!("Error opening testcases file!");
-            return (false, code_file);       
+            return (false, code_file);
         };
         match lc.execute(&code_file, data_input) {
             Ok(result) => {
@@ -69,7 +68,7 @@ pub(crate) fn execute_testcases(
                             println!(
                                 "{}",
                                 "Testcases can be found in testcase.txt".yellow().italic()
-                                );
+                            );
                         }
                         result.is_correct()
                     }

@@ -44,7 +44,7 @@ impl CodeFile {
             eprintln!("No code file found! Try creating a file named with proper extension",);
             std::process::exit(1);
         });
-        let Ok(code) = std::fs::read_to_string(&code_file.path) else { 
+        let Ok(code) = std::fs::read_to_string(&code_file.path) else {
             eprintln!("Error reading the code file!");
             std::process::exit(1);
         };
@@ -65,14 +65,14 @@ impl CodeFile {
         let language = Language::from_str(extension)?;
 
         Some((
-                file_name,
-                CodeFile {
-                    language,
-                    path: path.clone(),
-                    question_title: String::new(),
-                    code: String::new(),
-                },
-                ))
+            file_name,
+            CodeFile {
+                language,
+                path: path.clone(),
+                question_title: String::new(),
+                code: String::new(),
+            },
+        ))
     }
 
     fn parse_code(code: &str, language: Language) -> Result<(String, String), &str> {
@@ -95,7 +95,9 @@ impl CodeFile {
             return Err("No leetcode problem found in the code file. Please add the problem link in the code file using comments.");
         }
         let code = code[start..end].trim();
-        let code = code.trim_end_matches(language.inline_comment_start()).trim_end();
+        let code = code
+            .trim_end_matches(language.inline_comment_start())
+            .trim_end();
         parsed_code = code.to_string();
 
         Ok((question_title, parsed_code))
@@ -103,7 +105,7 @@ impl CodeFile {
 
     pub fn from_file(path: &str) -> Self {
         let path = PathBuf::from(&path);
-        let Some(file) =  Self::is_valid_file(&path) else { 
+        let Some(file) =  Self::is_valid_file(&path) else {
             eprintln!("Invalid file!");
             std::process::exit(1);
         };
