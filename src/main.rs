@@ -1,6 +1,5 @@
 use crate::args::Cli;
 use crate::file_parser::codefile::CodeFile;
-use crate::handlers::html_opener::open_html;
 use crate::utils::{execute_testcases, submit};
 
 use args::Commands;
@@ -40,7 +39,7 @@ fn main() -> Result<()> {
             let filename = "daily_challenge.html";
             std::fs::write(filename, question.content)?;
             println!("Saved question as HTML to {}", filename.cyan());
-            open_html(filename);
+            open::that(filename)?;
         }
         Some(Commands::Question { question_name }) => {
             let question_name = if let Some(idx) = question_name.find("leetcode.com/problems/") {
@@ -62,7 +61,7 @@ fn main() -> Result<()> {
             // save to filename
             std::fs::write(&filename, question.content)?;
             println!("Saved question as HTML to {}", filename.cyan());
-            open_html(&filename);
+            open::that(filename)?;
         }
         Some(Commands::RunCustom {
             testcases,
@@ -88,10 +87,7 @@ fn main() -> Result<()> {
             if is_correct {
                 submit(&lc, code_file)?;
             } else {
-                bail!(
-                    "{}",
-                    "Aborting submission due to failed testcase(s)".red().bold()
-                );
+                bail!("Aborting submission due to failed testcase(s)".red().bold());
             }
         }
         None => {}
