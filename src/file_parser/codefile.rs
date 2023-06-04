@@ -1,7 +1,10 @@
 use eyre::Result;
 
 use super::language::*;
-use std::{path::PathBuf, str::FromStr};
+use std::{
+    path::{Path, PathBuf},
+    str::FromStr,
+};
 
 pub struct CodeFile {
     pub language: Language,
@@ -22,8 +25,8 @@ impl Default for CodeFile {
 }
 
 impl CodeFile {
-    pub fn from_file(path: &str) -> Result<Self> {
-        let path = PathBuf::from(&path);
+    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self> {
+        let path = PathBuf::from(path.as_ref());
         let (_file_name, mut code_file) =
             Self::is_valid_file(&path).ok_or_else(|| eyre::eyre!("Invalid file"))?;
         let code = std::fs::read_to_string(&path)?;
@@ -36,9 +39,9 @@ impl CodeFile {
         Ok(code_file)
     }
 
-    pub fn from_dir() -> Result<Self> {
+    pub fn from_dir<P: AsRef<Path>>(path: P) -> Result<Self> {
         let mut code_file: Option<CodeFile> = None;
-        for file in std::fs::read_dir(".")?.filter_map(|f| f.ok()) {
+        for file in std::fs::read_dir(path.as_ref())?.filter_map(|f| f.ok()) {
             let path = file.path();
             if let Some((file_name, code_file_)) = Self::is_valid_file(&path) {
                 code_file = Some(code_file_);
@@ -60,16 +63,16 @@ impl CodeFile {
         Ok(code_file)
     }
 
-    fn is_valid_file<'a>(path: &'a std::path::PathBuf) -> Option<(&'a str, Self)> {
-        let file_name = path.file_name().and_then(|filename| filename.to_str())?;
-        let extension = path.extension().and_then(|ext| ext.to_str())?;
-        let language = Language::from_str(extension).ok()?;
+    fn is_valid_file<'a, P: AsRef<Path>>(path: &'a P) -> Option<(&'a str, Self)> {
+        let extension = path.as_ref().extension().and_then(|ext| ext.to_str())?;
 
         Some((
-            file_name,
+            path.as_ref()
+                .file_name()
+                .and_then(|filename| filename.to_str())?,
             CodeFile {
-                language,
-                path: path.clone(),
+                language: Language::from_str(extension).ok()?,
+                path: path.as_ref().into(),
                 question_title: String::new(),
                 code: String::new(),
             },

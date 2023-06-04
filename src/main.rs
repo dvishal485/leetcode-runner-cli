@@ -67,7 +67,7 @@ fn main() -> Result<()> {
             testcases,
             filename,
         }) => {
-            _ = execute_testcases(filename, Some(testcases), &lc)?;
+            _ = execute_testcases(filename, Some(&testcases), &lc)?;
             // bail if `is_correct == false`?
         }
         Some(Commands::Run { filename }) => {
@@ -77,7 +77,7 @@ fn main() -> Result<()> {
             let code_file = if let Some(path) = filename {
                 CodeFile::from_file(&path)?
             } else {
-                CodeFile::from_dir()?
+                CodeFile::from_dir(".")?
             };
 
             submit(&lc, code_file)?;

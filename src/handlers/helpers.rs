@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{path::Path, str::FromStr};
 
 use colored::Colorize;
 use eyre::Result;
@@ -75,9 +75,9 @@ pub(crate) struct BoilerPlateCode {
 
 use super::super::file_parser::language::Language;
 impl BoilerPlateCode {
-    pub(crate) fn save_code(&self, filename: &str, title_slug: &str) -> Result<()> {
+    pub(crate) fn save_code<P: AsRef<Path>>(&self, file_path: P, title_slug: &str) -> Result<()> {
         let language = Language::from_str(&self.langSlug)?;
-        let mut file = std::fs::File::create(filename)?;
+        let mut file = std::fs::File::create(file_path)?;
         let comment = format!(
             " {} #LCEND https://leetcode.com/problems/{}/",
             language.inline_comment_start(),
