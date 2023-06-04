@@ -15,12 +15,13 @@ mod file_parser;
 mod handlers;
 mod utils;
 
+const LC_COOKIE_ENV_KEY: &str = "LC_COOKIE";
+
 fn main() -> ExitCode {
     let cli = Cli::parse();
 
-    let key = "LC_COOKIE";
-    let Some(cookie) = std::env::var_os(key) else {
-        eprintln!("{} is not set in the environment.", key);
+    let Some(cookie) = std::env::var_os(LC_COOKIE_ENV_KEY) else {
+        eprintln!("{} is not set in the environment.", LC_COOKIE_ENV_KEY);
         return ExitCode::FAILURE;
     };
     let Some( cookie) = cookie.to_str() else {
