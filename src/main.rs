@@ -87,10 +87,7 @@ fn main() -> Result<()> {
             if is_correct {
                 submit(&lc, code_file)?;
             } else {
-                bail!(
-                    "{}",
-                    "Aborting submission due to failed testcase(s)".red().bold()
-                );
+                bail!("Aborting submission due to failed testcase(s)".red().bold());
             }
         }
         None => {}
