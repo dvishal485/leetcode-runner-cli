@@ -2,8 +2,7 @@ use crate::file_parser::codefile::CodeFile;
 use crate::handlers::leetcode::{Authorized, LeetCode};
 use crate::handlers::utils::{ExecutionResult, SubmissionResult};
 
-use colored::Colorize;
-use eyre::Result;
+use eyre::{bail, Result};
 
 use std::process::ExitCode;
 
@@ -11,136 +10,93 @@ pub(crate) fn execute_testcases(
     filename: Option<String>,
     testcases: Option<String>,
     lc: &LeetCode<Authorized>,
-) -> (bool, CodeFile) {
-    let is_correct;
-    let code_file: CodeFile;
-    if let Some(filename) = filename {
-        code_file = CodeFile::from_file(&filename);
+) -> Result<(bool, CodeFile)> {
+    let code_file = if let Some(path) = filename {
+        CodeFile::from_file(&path)
     } else {
-        code_file = CodeFile::from_dir();
-    }
-    if let Some(testcases) = testcases {
-        let Ok(data_input) = std::fs::read_to_string(&testcases) else{
-            eprintln!("Error opening testcases file!");
-            return (false, code_file);
-        };
-        match lc.execute(&code_file, data_input) {
-            Ok(result) => {
-                println!();
-                is_correct = match result {
-                    ExecutionResult::Success(result) => {
-                        result.display();
-                        result.is_correct()
-                    }
-                    ExecutionResult::LimitExceeded(limit_exceeded) => {
-                        limit_exceeded.display();
-                        false
-                    }
-                    ExecutionResult::CompileError(compile_error) => {
-                        compile_error.display();
-                        false
-                    }
-                    ExecutionResult::RuntimeError(runtime_error) => {
-                        runtime_error.display();
-                        false
-                    }
-                    ExecutionResult::PendingResult(state) => {
-                        println!("{}", state);
-                        false
-                    }
-                    ExecutionResult::Unknown(_) => {
-                        eprintln!("Unknown Error!");
-                        false
-                    }
+        CodeFile::from_dir()
+    };
+
+    match testcases {
+        Some(testcases) => {
+            let data_input = std::fs::read_to_string(&testcases)?;
+
+            match lc.execute(&code_file, data_input)? {
+                ExecutionResult::Success(result) => {
+                    result.display();
+                    return Ok((result.is_correct(), code_file));
                 }
-            }
-            Err(e) => {
-                eprintln!("Some error occured! {e}");
-                is_correct = false;
+                ExecutionResult::LimitExceeded(limit_exceeded) => {
+                    bail!(limit_exceeded); // TODO(nozwock): impl Display for these, so you can do `fail_state => bail!(fail_state),`
+                }
+                ExecutionResult::CompileError(compile_error) => {
+                    bail!(compile_error);
+                }
+                ExecutionResult::RuntimeError(runtime_error) => {
+                    bail!(runtime_error);
+                }
+                ExecutionResult::PendingResult(pending) => {
+                    bail!(pending.state);
+                }
+                ExecutionResult::Unknown(_) => {
+                    bail!("Unknown error");
+                }
             }
         }
-    } else {
-        let result = lc.execute_default(&code_file);
-        println!();
-        match result {
-            Ok(result) => {
-                is_correct = match result {
-                    ExecutionResult::Success(result) => {
-                        result.display();
-                        if !result.is_correct() {
-                            println!(
-                                "{}",
-                                "Testcases can be found in testcase.txt".yellow().italic()
-                            );
-                        }
-                        result.is_correct()
-                    }
-                    ExecutionResult::LimitExceeded(limit_exceeded) => {
-                        limit_exceeded.display();
-                        false
-                    }
-                    ExecutionResult::CompileError(compile_error) => {
-                        compile_error.display();
-                        false
-                    }
-                    ExecutionResult::RuntimeError(runtime_error) => {
-                        runtime_error.display();
-                        false
-                    }
-                    ExecutionResult::PendingResult(state) => {
-                        println!("{}", state);
-                        false
-                    }
-                    ExecutionResult::Unknown(_) => {
-                        eprintln!("Unknown Error!");
-                        false
-                    }
+        None => {
+            match lc.execute_default(&code_file)? {
+                ExecutionResult::Success(result) => {
+                    result.display();
+                    // if !result.is_correct() {
+                    //     println!(
+                    //         "{}",
+                    //         "Testcases can be found in testcase.txt".yellow().italic()
+                    //     );
+                    // }
+                    return Ok((result.is_correct(), code_file));
                 }
-            }
-            Err(e) => {
-                eprintln!("Some error occured! {e}");
-                is_correct = false;
+                ExecutionResult::LimitExceeded(limit_exceeded) => {
+                    bail!(limit_exceeded);
+                }
+                ExecutionResult::CompileError(compile_error) => {
+                    bail!(compile_error);
+                }
+                ExecutionResult::RuntimeError(runtime_error) => {
+                    bail!(runtime_error);
+                }
+                ExecutionResult::PendingResult(pending) => {
+                    bail!(pending.state);
+                }
+                ExecutionResult::Unknown(_) => {
+                    bail!("Unknown error");
+                }
             }
         }
     }
-    (is_correct, code_file)
 }
 
-pub(crate) fn submit(lc: &LeetCode<Authorized>, code_file: CodeFile) -> ExitCode {
-    match lc.submit(&code_file) {
-        Ok(result) => match result {
-            SubmissionResult::Success(success) => {
-                success.display();
-                ExitCode::SUCCESS
-            }
-            SubmissionResult::LimitExceeded(wrong) => {
-                wrong.display();
-                ExitCode::FAILURE
-            }
-            SubmissionResult::PendingResult(state) => {
-                println!("{}", state);
-                ExitCode::FAILURE
-            }
-            SubmissionResult::CompileError(compile_err) => {
-                compile_err.display();
-                ExitCode::FAILURE
-            }
-            SubmissionResult::RuntimeError(runtime_error) => {
-                runtime_error.display();
-                ExitCode::FAILURE
-            }
-            SubmissionResult::Wrong(wrong) => {
-                wrong.display();
-                ExitCode::FAILURE
-            }
-            SubmissionResult::Unknown(_) => {
-                eprintln!("Unknown Error!");
-                ExitCode::FAILURE
-            }
-        },
-        Err(e) => {
-            eprintln!("Some error occured! {e}");
-            return ExitCode::FAILURE;
+pub(crate) fn submit(lc: &LeetCode<Authorized>, code_file: CodeFile) -> Result<()> {
+    match lc.submit(&code_file)? {
+        SubmissionResult::Success(success) => success.display(),
+        SubmissionResult::LimitExceeded(wrong) => {
+            bail!(wrong)
         }
-    }
+        SubmissionResult::PendingResult(state) => {
+            bail!(state.state)
+        }
+        SubmissionResult::CompileError(compile_err) => {
+            bail!(compile_err)
+        }
+        SubmissionResult::RuntimeError(runtime_error) => {
+            bail!(runtime_error)
+        }
+        SubmissionResult::Wrong(wrong) => {
+            bail!(wrong)
+        }
+        SubmissionResult::Unknown(_) => {
+            bail!("Unknown error")
+        }
+    };
+
+    Ok(())
 }

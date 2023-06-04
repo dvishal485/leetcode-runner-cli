@@ -135,7 +135,7 @@ impl LeetCode<Authorized> {
         Ok(data.json::<Data>().map(|op| op.data.question)?)
     }
 
-    pub fn question_metadata(&self, title_slug: &str) -> Result<Question, &str> {
+    pub fn question_metadata(&self, title_slug: &str) -> Result<Question> {
         let client = &self.client;
         let url = "https://leetcode.com/graphql";
 
@@ -143,9 +143,11 @@ impl LeetCode<Authorized> {
             query: "\n query consolePanelConfig($titleSlug: String!) {\n question(titleSlug: $titleSlug) {\n questionId\n questionFrontendId\n questionTitle\n enableDebugger\n enableRunCode\n enableSubmit\n enableTestMode\n exampleTestcaseList\n metaData\n }\n}\n".to_string(),
             variables: serde_json::to_string(&Variables { titleSlug: title_slug.to_string() }).unwrap(),
         };
-        let Ok(data) = client.post(url).json(&query).send() else {
-            return Err("Failed to fetch question id from leetcode!");
-        };
+        let data = client
+            .post(url)
+            .json(&query)
+            .send()
+            .wrap_err("Failed to fetch question id from LeetCode")?;
 
         #[derive(Debug, Deserialize)]
         struct QuestionWrapper {
@@ -158,7 +160,7 @@ impl LeetCode<Authorized> {
         }
 
         data.json::<Data>()
-            .map_err(|_| "Failed to parse question id from leetcode!")
+            .wrap_err("Failed to parse question id from LeetCode")
             .map(|opt| opt.data.question)
     }
 }

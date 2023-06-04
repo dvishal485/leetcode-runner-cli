@@ -1,7 +1,9 @@
 use crate::handlers::leetcode::*;
 
+use eyre::{bail, Context, Result};
+
 impl LeetCode<Authorized> {
-    pub fn submit(&self, codefile: &CodeFile) -> Result<SubmissionResult, &str> {
+    pub fn submit(&self, codefile: &CodeFile) -> Result<SubmissionResult> {
         let question_title = codefile.question_title.clone();
         let ques = self.question_metadata(&question_title)?;
         let question_id = ques.questionId;
@@ -19,7 +21,12 @@ impl LeetCode<Authorized> {
         question_id: String,
         question_title: String,
         typed_code: String,
-    ) -> Result<SubmissionResult, &str> {
+    ) -> Result<SubmissionResult> {
+        #[derive(Debug, Deserialize)]
+        struct SubmissionID {
+            submission_id: u32,
+        }
+
         let client = &self.client;
         let url = format!("https://leetcode.com/problems/{}/submit/", question_title);
         let submission = SubmitCode {
@@ -27,60 +34,46 @@ impl LeetCode<Authorized> {
             question_id,
             typed_code,
         };
-        let Ok(data)= client.post(&url).json(&submission).send() else {
-            return Err("Failed to parse arguments");
-        };
-        #[derive(Debug, Deserialize)]
-        struct SubmissionID {
-            submission_id: u32,
-        }
-        // println!("{}", data.text().unwrap());
-        let Ok(data) = data.json::<SubmissionID>() else {
-            return Err("Failed to fetch submission id from leetcode! Check your submissions manually on leetcode");
-        };
+        let data = client.post(&url).json(&submission).send()?.json::<SubmissionID>().wrap_err("Failed to fetch submission id from LeetCode, Check your submissions manually on leetcode")?;
+
         println!("Evaluating solution...");
         let submission_id = data.submission_id;
         let mut last_state = PendingState::Unknown;
 
         loop {
             let url = format!("https://leetcode.com/submissions/detail/{submission_id}/check/");
-            let Ok(data) = client.get(&url).send() else {
-                return Err("Failed to parse arguments!");
-            };
+            let data = client
+                .get(&url)
+                .send()?
+                .json::<SubmissionResult>()
+                .wrap_err(
+                    "Failed to fetch from leetcode! Try again after sometime or renew cookie",
+                )?;
 
-            let Ok(data) = data.json::<SubmissionResult>() else  {
-                return Err("Failed to fetch from leetcode! Try again after sometime or renew cookie");
-            };
             match data {
                 SubmissionResult::PendingResult(data) => {
                     let curr_state = data.state();
                     match curr_state {
-                        PendingState::Pending => {
-                            if last_state != PendingState::Pending {
-                                println!("Status : Evaluation Pending");
-                            }
+                        PendingState::Pending if last_state != PendingState::Pending => {
+                            println!("Status : Evaluation Pending");
                         }
-                        PendingState::Started => {
-                            if last_state != PendingState::Started {
-                                println!("Status : Execution Started");
-                            }
+                        PendingState::Started if last_state != PendingState::Started => {
+                            println!("Status : Execution Started");
                         }
                         PendingState::Success => {
-                            println!("Your code was executed successfully but we failed to parse result\nCheck on leetcode manually");
-                            std::process::exit(1);
+                            bail!("Your code was executed successfully but we failed to parse result\nCheck on leetcode manually");
                         }
                         PendingState::Unknown => {
-                            println!(
+                            bail!(
                                 "Status : {}\nKindly report this state to developer",
-                                data.state.as_str()
+                                data.state
                             );
-                            std::process::exit(1);
                         }
+                        _ => {}
                     };
                     last_state = curr_state;
-                    continue;
                 }
-                data => return Ok(data),
+                not_pending_data => return Ok(not_pending_data),
             };
         }
     }

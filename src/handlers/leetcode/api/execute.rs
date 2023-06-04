@@ -1,30 +1,25 @@
 use crate::handlers::{leetcode::*, utils::ExecutionResult};
 
+use eyre::{bail, Context, Result};
+
 impl LeetCode<Authorized> {
-    pub fn execute_default(&self, codefile: &CodeFile) -> Result<ExecutionResult, &str> {
+    pub fn execute_default(&self, codefile: &CodeFile) -> Result<ExecutionResult> {
         self.execute(codefile, String::new())
     }
-    pub fn execute(
-        &self,
-        codefile: &CodeFile,
-        mut data_input: String,
-    ) -> Result<ExecutionResult, &str> {
+    pub fn execute(&self, codefile: &CodeFile, mut data_input: String) -> Result<ExecutionResult> {
         let question_title = codefile.question_title.clone();
         let ques = self.question_metadata(&question_title)?;
-        if data_input == "" {
+        if data_input.is_empty() {
             data_input = ques.exampleTestcaseList.join("\n");
+
             // write this to testcase.txt
-            if let Ok(mut file) = std::fs::File::create("testcase.txt") {
-                if let Ok(_) = std::io::Write::write_all(&mut file, data_input.as_bytes()) {
-                    println!("Wrote default testcases to testcase.txt");
-                } else {
-                    eprintln!("Failed to write default testcases to testcase.txt!");
-                }
-            } else {
-                eprintln!("Failed to create testcase.txt!");
-            }
+            let mut file = std::fs::File::create("testcase.txt")?;
+            std::io::Write::write_all(&mut file, data_input.as_bytes())?;
+            println!("Wrote default testcases to testcase.txt");
         }
+
         let question_id = ques.questionId;
+
         self._execute(
             codefile.language.to_string(),
             question_id,
@@ -41,12 +36,13 @@ impl LeetCode<Authorized> {
         question_title: String,
         typed_code: String,
         data_input: String,
-    ) -> Result<ExecutionResult, &str> {
+    ) -> Result<ExecutionResult> {
         let client = &self.client;
         let url = format!(
             "https://leetcode.com/problems/{}/interpret_solution/",
             question_title
         );
+
         let testcase = TestCaseExec {
             lang,
             question_id,
@@ -54,26 +50,31 @@ impl LeetCode<Authorized> {
             typed_code,
             data_input,
         };
-        let Ok(data)= client.post(&url).json(&testcase).send() else {
-            return Err("Failed to parse arguments!");
-        };
-        let Ok(data) = data.json::<InterpretID>() else{
-            return Err("Failed to parse JSON from leetcode! Try again after sometime or renew cookie");
-        };
+
+        let data = client
+            .post(&url)
+            .json(&testcase)
+            .send()?
+            .json::<InterpretID>()
+            .wrap_err(
+                "Failed to parse JSON from LeetCode, Try again after sometime or renew your cookie",
+            )?;
 
         let interpret_id = data.interpret_id;
+
         println!("Executing testcases...");
         let mut last_state = PendingState::Unknown;
         loop {
             let url = format!("https://leetcode.com/submissions/detail/{interpret_id}/check/");
             // std::thread::sleep(std::time::Duration::from_secs(7));
-            let Ok(data) = client.get(&url).send() else {
-                return Err("Failed to parse arguments!");
-            };
+            let data = client
+                .get(&url)
+                .send()?
+                .json::<ExecutionResult>()
+                .wrap_err(
+                "Failed to parse JSON from LeetCode, Try again after sometime or renew your cookie",
+            )?;
 
-            let Ok(data) = data.json::<ExecutionResult>() else  {
-                return Err("Failed to parse JSON from leetcode! Try again after sometime or renew cookie");
-            };
             match data {
                 ExecutionResult::PendingResult(data) => {
                     let curr_state = data.state();
@@ -89,22 +90,18 @@ impl LeetCode<Authorized> {
                             }
                         }
                         PendingState::Success => {
-                            println!("Your code was executed successfully but we failed to parse result\nCheck on leetcode manually");
-                            std::process::exit(1);
+                            bail!("our code was executed successfully but we failed to parse result\nCheck on leetcode manually");
                         }
                         PendingState::Unknown => {
-                            println!(
+                            bail!(
                                 "Status : {}\nKindly report this state to developer",
                                 data.state.as_str()
                             );
-                            std::process::exit(1);
                         }
                     };
                     last_state = curr_state;
-
-                    continue;
                 }
-                data => return Ok(data),
+                not_pending_data => return Ok(not_pending_data),
             };
         }
     }

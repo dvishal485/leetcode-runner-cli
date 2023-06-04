@@ -62,16 +62,11 @@ fn main() -> Result<()> {
             testcases,
             filename,
         }) => {
-            let success = execute_testcases(filename, Some(testcases), &lc).0;
-            if !success {
-                bail!("Failed to execute Testcases");
-            };
+            _ = execute_testcases(filename, Some(testcases), &lc)?;
+            // bail if `is_correct == false`?
         }
         Some(Commands::Run { filename }) => {
-            let success = execute_testcases(filename, None, &lc).0;
-            if !success {
-                bail!("Failed to execute"); // TODO: Fill the err message
-            };
+            _ = execute_testcases(filename, None, &lc)?;
         }
         Some(Commands::FastSubmit { filename }) => {
             let code_file = if let Some(path) = filename {
@@ -80,18 +75,16 @@ fn main() -> Result<()> {
                 CodeFile::from_dir()
             };
 
-            submit(&lc, code_file); // TODO(nozwock): Use thiserror for SubmissionResult
+            submit(&lc, code_file)?;
         }
         Some(Commands::Submit { filename }) => {
-            let (testcase_result, code_file) = execute_testcases(filename, None, &lc);
-            if testcase_result {
-                submit(&lc, code_file);
+            let (is_correct, code_file) = execute_testcases(filename, None, &lc)?;
+            if is_correct {
+                submit(&lc, code_file)?;
             } else {
                 bail!(
                     "{}",
-                    "Aborting submission due to failed testcase(s)!"
-                        .red()
-                        .bold()
+                    "Aborting submission due to failed testcase(s)".red().bold()
                 );
             }
         }
