@@ -1,4 +1,4 @@
-use std::{path::Path, str::FromStr};
+use std::{fmt, path::Path, str::FromStr};
 
 use colored::Colorize;
 use eyre::Result;
@@ -51,10 +51,24 @@ pub struct DailyChallengeQuestion {
     pub titleSlug: String,
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum Difficulty {
     Easy,
     Medium,
     Hard,
+}
+
+impl FromStr for Difficulty {
+    type Err = eyre::ErrReport;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        match s.to_lowercase().as_ref() {
+            "easy" => Ok(Difficulty::Easy),
+            "medium" => Ok(Difficulty::Medium),
+            "hard" => Ok(Difficulty::Hard),
+            _ => Err(eyre::eyre!("Unknown difficulty")),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -99,13 +113,13 @@ impl BoilerPlateCode {
     }
 }
 
-impl std::fmt::Display for DailyChallenge {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for DailyChallenge {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "Title      : {}\nDifficulty : {}\nDate       : {}\nStatus     : {}\nAC Rate    : {:.2}%",
             self.question.title.bright_cyan(),
-            Difficulty::from_str(&self.question.difficulty),
+            Difficulty::from_str(&self.question.difficulty).map_err(|_| fmt::Error)?,
             self.date,
             self.userStatus,
             self.question.acRate
@@ -113,23 +127,12 @@ impl std::fmt::Display for DailyChallenge {
     }
 }
 
-impl std::fmt::Display for Difficulty {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Difficulty {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Difficulty::Easy => write!(f, "{}", "Easy".bright_green()),
             Difficulty::Medium => write!(f, "{}", "Medium".bright_yellow()),
             Difficulty::Hard => write!(f, "{}", "Hard".bright_red()),
-        }
-    }
-}
-
-impl Difficulty {
-    pub fn from_str(difficulty: &str) -> Difficulty {
-        match difficulty {
-            "Easy" => Difficulty::Easy,
-            "Medium" => Difficulty::Medium,
-            "Hard" => Difficulty::Hard,
-            _ => panic!("Invalid difficulty"),
         }
     }
 }
