@@ -1,3 +1,5 @@
+use eyre::Result;
+
 use super::language::*;
 use std::path::PathBuf;
 
@@ -20,43 +22,42 @@ impl Default for CodeFile {
 }
 
 impl CodeFile {
-    pub fn from_dir() -> Self {
-        let mut code_file: Option<CodeFile> = None;
-        let Ok(files) = std::fs::read_dir("./") else {
-            eprintln!("Error reading the current directory!");
-            std::process::exit(1);
-        };
-        for file in files {
-            let Ok(file) = file else {
-                // Bad path
-                continue
-            };
-            let path = file.path();
-            let Some(valid_file) = Self::is_valid_file(&path) else {continue};
-            let file_name = valid_file.0;
-            code_file = Some(valid_file.1);
+    pub fn from_file(path: &str) -> Result<Self> {
+        let path = PathBuf::from(&path);
+        let (_file_name, mut code_file) =
+            Self::is_valid_file(&path).ok_or_else(|| eyre::eyre!("Invalid file"))?;
+        let code = std::fs::read_to_string(&path)?;
 
-            if file_name.starts_with("main") {
-                break;
-            }
-        }
-        let mut code_file = code_file.unwrap_or_else(|| {
-            eprintln!("No code file found! Try creating a file named with proper extension",);
-            std::process::exit(1);
-        });
-        let Ok(code) = std::fs::read_to_string(&code_file.path) else {
-            eprintln!("Error reading the code file!");
-            std::process::exit(1);
-        };
+        let (question_title, parsed_code) = Self::parse_code(&code, code_file.language)?;
 
-        let parsed_file = Self::parse_code(&code, code_file.language);
-        let Ok((question_title, parsed_code)) = parsed_file else{
-            eprintln!("Error parsing the code file!\n{}", parsed_file.unwrap_err());
-            std::process::exit(1);
-        };
         code_file.question_title = question_title;
         code_file.code = parsed_code;
-        code_file
+
+        Ok(code_file)
+    }
+
+    pub fn from_dir() -> Result<Self> {
+        let mut code_file: Option<CodeFile> = None;
+        for file in std::fs::read_dir(".")?.filter_map(|f| f.ok()) {
+            let path = file.path();
+            if let Some((file_name, code_file_)) = Self::is_valid_file(&path) {
+                code_file = Some(code_file_);
+                if file_name.starts_with("main") {
+                    break;
+                }
+            }
+        }
+        let mut code_file = code_file.ok_or_else(|| {
+            eyre::eyre!("No code file found! Try creating a file named with proper extension")
+        })?;
+        let code = std::fs::read_to_string(&code_file.path)?;
+
+        let (question_title, parsed_code) = Self::parse_code(&code, code_file.language)?;
+
+        code_file.question_title = question_title;
+        code_file.code = parsed_code;
+
+        Ok(code_file)
     }
 
     fn is_valid_file<'a>(path: &'a std::path::PathBuf) -> Option<(&'a str, Self)> {
@@ -75,9 +76,7 @@ impl CodeFile {
         ))
     }
 
-    fn parse_code(code: &str, language: Language) -> Result<(String, String), &str> {
-        let question_title: String;
-        let parsed_code: String;
+    fn parse_code(code: &str, language: Language) -> Result<(String, String)> {
         let start = code
             .find("#LCSTART")
             .map(|idx| idx + code[idx..].find('\n').unwrap_or(0))
@@ -87,40 +86,26 @@ impl CodeFile {
             .unwrap_or(0);
 
         let end = code.find("#LCEND").unwrap_or(code.len());
-        if let Some(problem) = code.find("leetcode.com/problems/") {
-            let problem = (&code[problem..]).split_whitespace().next().unwrap();
-            let problem = problem.split('/').skip(2).next().unwrap();
-            question_title = problem.to_string();
-        } else {
-            return Err("No leetcode problem found in the code file. Please add the problem link in the code file using comments.");
-        }
-        let code = code[start..end].trim();
-        let code = code
+        let question_title = code[code.find("leetcode.com/problems/").ok_or_else(|| {
+            eyre::eyre!(
+                "No leetcode problem found in the code file. \
+        Please add the problem link in the code file using comments."
+            )
+        })?..]
+            .split_whitespace()
+            .next()
+            .expect("Should be Some since the find method succeed")
+            .split('/')
+            .skip(2)
+            .next()
+            .ok_or_else(|| eyre::eyre!("Invalid link, expected question identifier"))?
+            .to_string();
+        let parsed_code = code[start..end]
+            .trim()
             .trim_end_matches(language.inline_comment_start())
-            .trim_end();
-        parsed_code = code.to_string();
+            .trim_end()
+            .to_string();
 
         Ok((question_title, parsed_code))
-    }
-
-    pub fn from_file(path: &str) -> Self {
-        let path = PathBuf::from(&path);
-        let Some(file) =  Self::is_valid_file(&path) else {
-            eprintln!("Invalid file!");
-            std::process::exit(1);
-        };
-        let (_, mut valid_file) = file;
-        let Ok(code) = std::fs::read_to_string(&path) else {
-            eprintln!("Error while reading file {}!", path.display());
-            std::process::exit(1);
-        };
-        let parsed_file = Self::parse_code(&code, valid_file.language);
-        let Ok((question_title, parsed_code)) = parsed_file else{
-            eprintln!("Error parsing the code file!\n{}", parsed_file.unwrap_err());
-            std::process::exit(1);
-        };
-        valid_file.question_title = question_title;
-        valid_file.code = parsed_code;
-        valid_file
     }
 }
