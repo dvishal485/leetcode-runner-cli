@@ -115,8 +115,7 @@ impl LeetCode<Authorized> {
                     0, &boiler_code_vector[0].langSlug
                 );
                 std::io::stdin().read_line(&mut input)?;
-                let input = input.trim();
-                let input = input.parse::<usize>()?;
+                let input = input.trim().parse::<usize>()?;
                 boiler_code_vector.swap_remove(input)
             }
         };
