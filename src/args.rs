@@ -20,26 +20,26 @@ pub enum Commands {
     RunCustom {
         /// Testcases to run
         testcases: String,
-        #[arg(value_name = "PATH")]
+        #[arg(short, long)]
         /// File to execute
         file: Option<PathBuf>,
     },
     #[command(visible_alias = "-r")]
     Run {
-        #[arg(value_name = "PATH")]
+        #[arg(short, long)]
         /// File to execute with default testcases
         file: Option<PathBuf>,
     },
     /// Submits code to LeetCode
     #[command(visible_alias = "-fs")]
     FastSubmit {
-        #[arg(value_name = "PATH")]
+        #[arg(short, long)]
         /// File to submit
         file: Option<PathBuf>,
     },
     #[command(visible_alias = "-s")]
     Submit {
-        #[arg(value_name = "PATH")]
+        #[arg(short, long)]
         /// File to submit
         file: Option<PathBuf>,
     },
@@ -58,9 +58,10 @@ pub enum Commands {
 pub enum Execute {
     #[command(visible_alias = "-t")]
     Testcases {
-        #[arg(value_name = "PATH")]
+        #[arg(short, long)]
         /// File to run
         file: Option<PathBuf>,
+        #[arg(short, long)]
         /// Testcases to run
         testcases: Option<String>,
     },
