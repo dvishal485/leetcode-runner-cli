@@ -79,11 +79,11 @@ impl CodeFile {
     fn parse_code(code: &str, language: Language) -> Result<(String, String)> {
         let start = code
             .find("#LCSTART")
-            .map(|idx| idx + code[idx..].find('\n').unwrap_or(0))
+            .map(|idx| idx + code[idx..].find('\n').unwrap_or_default())
             // This returning None means the user
             // wants to submit a practically empty file,
             // but hey we don't judge!
-            .unwrap_or(0);
+            .unwrap_or_default();
 
         let end = code.find("#LCEND").unwrap_or(code.len());
         let question_title = code[code.find("leetcode.com/problems/").ok_or_else(|| {

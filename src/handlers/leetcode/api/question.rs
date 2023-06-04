@@ -171,15 +171,15 @@ impl LeetCode<Authorized> {
         };
 
         let mut input = String::new();
-        println!("Filename (main.{}) : ", &(boiler_code.extension()));
+        println!("Filename (main.{}) : ", &(boiler_code.extension()?));
         std::io::stdin().read_line(&mut input)?;
         let input = input.trim();
         let filename = if input.is_empty() {
-            format!("main.{}", boiler_code.extension())
+            format!("main.{}", boiler_code.extension()?)
         } else {
             input.to_string()
         };
-        boiler_code.save_code(&filename, &title_slug);
+        boiler_code.save_code(&filename, &title_slug)?;
 
         Ok(data.json::<Data>().map(|op| op.data.question)?)
     }

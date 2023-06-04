@@ -1,4 +1,5 @@
 use colored::Colorize;
+use eyre::Result;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize)]
@@ -72,39 +73,29 @@ pub(crate) struct BoilerPlateCode {
 
 use super::super::file_parser::language::Language;
 impl BoilerPlateCode {
-    pub(crate) fn save_code(&self, filename: &str, title_slug: &str) {
-        let language = Language::from_slug(&self.langSlug).unwrap_or_else(|| {
-            eprintln!("Error: Unable to identify language of code file!");
-            std::process::exit(1);
-        });
-        let Ok(mut file) = std::fs::File::create(filename) else{
-                eprintln!("Error: Unable to create file");
-                std::process::exit(1);
-            };
+    pub(crate) fn save_code(&self, filename: &str, title_slug: &str) -> Result<()> {
+        let language = Language::from_slug(&self.langSlug)
+            .ok_or_else(|| eyre::eyre!("Unable to identify language of code file!"))?;
+        let mut file = std::fs::File::create(filename)?;
         let comment = format!(
             " {} #LCEND https://leetcode.com/problems/{}/",
             language.inline_comment_start(),
             title_slug.to_lowercase().trim().replace(" ", "-")
         );
+
         // write code into file along with the comment
-        if let Err(_) = std::io::Write::write_all(&mut file, self.code.as_bytes()) {
-            eprintln!("Error: Unable to write code into file");
-            std::process::exit(1);
-        }
-        if let Err(_) = std::io::Write::write_all(&mut file, comment.as_bytes()) {
-            eprintln!("Error: Unable to write code into file");
-            std::process::exit(1);
-        }
+        std::io::Write::write_all(&mut file, self.code.as_bytes())?;
+        std::io::Write::write_all(&mut file, comment.as_bytes())?;
+
+        Ok(())
     }
     pub(crate) fn is_supported(&self) -> bool {
         Language::from_slug(&self.langSlug).is_some()
     }
-    pub(crate) fn extension(&self) -> String {
-        let language = Language::from_slug(&self.langSlug).unwrap_or_else(|| {
-            eprintln!("Error: Unable to identify language of code file!");
-            std::process::exit(1);
-        });
-        language.extension().to_owned()
+    pub(crate) fn extension(&self) -> Result<String> {
+        let language = Language::from_slug(&self.langSlug)
+            .ok_or_else(|| eyre::eyre!("Unable to identify language of code file!"))?;
+        Ok(language.extension().to_owned())
     }
 }
 
