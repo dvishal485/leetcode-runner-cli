@@ -78,7 +78,7 @@ pub(crate) fn execute_testcases<P: AsRef<Path>>(
 
 pub(crate) fn submit(lc: &LeetCode<Authorized>, code_file: CodeFile) -> Result<()> {
     match lc.submit(&code_file)? {
-        SubmissionResult::Success(success) => success.display(),
+        SubmissionResult::Success(success) => println!("{}", success),
         SubmissionResult::LimitExceeded(wrong) => {
             bail!(wrong)
         }

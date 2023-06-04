@@ -1,9 +1,11 @@
+use std::fmt;
+
 use super::execution::*;
 use super::submission::*;
 use colored::Colorize;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(untagged)]
 pub enum SubmissionResult {
     Success(SubmitCorrect),
@@ -42,13 +44,27 @@ pub struct Question {
     pub exampleTestcaseList: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct PendingResult {
     pub(crate) state: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct Unknown {}
+
+impl fmt::Display for SubmissionResult {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            SubmissionResult::Success(inner) => write!(f, "{}", inner),
+            SubmissionResult::CompileError(inner) => write!(f, "{}", inner),
+            SubmissionResult::RuntimeError(inner) => write!(f, "{}", inner),
+            SubmissionResult::Wrong(inner) => write!(f, "{}", inner),
+            SubmissionResult::LimitExceeded(inner) => write!(f, "{}", inner),
+            SubmissionResult::PendingResult(inner) => write!(f, "{}", inner),
+            SubmissionResult::Unknown(inner) => write!(f, "Unknown"),
+        }
+    }
+}
 
 impl PendingResult {
     pub fn state(&self) -> PendingState {
@@ -56,10 +72,10 @@ impl PendingResult {
             "PENDING" => PendingState::Pending,
             "STARTED" => PendingState::Started,
             "SUCCESS" => PendingState::Success,
-            unknown_state => {
+            other => {
                 println!(
                     "Unknown state : {}\nKindly inform about this to the developer",
-                    unknown_state.cyan().bold()
+                    other.cyan().bold()
                 );
                 PendingState::Unknown
             }

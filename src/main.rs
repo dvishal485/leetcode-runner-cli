@@ -27,7 +27,7 @@ fn main() -> Result<()> {
 
     match cli.command {
         Some(Commands::Auth) => match lc.get_metadata() {
-            Ok(metadata) => metadata.display(),
+            Ok(metadata) => println!("{}", metadata),
             Err(err) => bail!(err),
         },
         Some(Commands::DailyChallenge) => {

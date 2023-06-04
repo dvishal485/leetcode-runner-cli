@@ -183,33 +183,3 @@ impl std::fmt::Display for SubmitWrong {
         )
     }
 }
-
-impl SubmitWrong {
-    pub fn display(&self) {
-        println!("{}", self);
-    }
-}
-
-impl SubmitLimitExceeded {
-    pub fn display(&self) {
-        println!("{}", self);
-    }
-}
-
-impl SubmitCorrect {
-    pub fn display(&self) {
-        println!("{}", self);
-    }
-}
-
-impl SubmitCompileError {
-    pub fn display(&self) {
-        println!("{}", self);
-    }
-}
-
-impl SubmitRuntimeError {
-    pub fn display(&self) {
-        println!("{}", self);
-    }
-}
