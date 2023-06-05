@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::file_parser::codefile::CodeFile;
 use crate::handlers::leetcode::{Authorized, LeetCode};
 use crate::handlers::utils::{ExecutionResult, SubmissionResult};
@@ -5,24 +7,24 @@ use crate::handlers::utils::{ExecutionResult, SubmissionResult};
 use eyre::{bail, Result};
 
 /// The first element of the return tuple indicates whether the answer is correct.
-pub(crate) fn execute_testcases(
-    filename: Option<String>,
-    testcases: Option<String>,
+pub(crate) fn execute_testcases<P: AsRef<Path>>(
+    file_path: Option<P>,
+    testcases: Option<&str>,
     lc: &LeetCode<Authorized>,
 ) -> Result<(bool, CodeFile)> {
-    let code_file = if let Some(path) = filename {
-        CodeFile::from_file(&path)?
+    let code_file = if let Some(path) = file_path {
+        CodeFile::from_file(path)?
     } else {
-        CodeFile::from_dir()?
+        CodeFile::from_dir(".")?
     };
 
     match testcases {
         Some(testcases) => {
-            let data_input = std::fs::read_to_string(&testcases)?;
+            let data_input = std::fs::read_to_string(testcases)?;
 
             match lc.execute(&code_file, data_input)? {
                 ExecutionResult::Success(result) => {
-                    result.display();
+                    println!("{}", result);
                     return Ok((result.is_correct(), code_file));
                 }
                 ExecutionResult::LimitExceeded(limit_exceeded) => {
@@ -38,14 +40,14 @@ pub(crate) fn execute_testcases(
                     bail!(pending.state);
                 }
                 ExecutionResult::Unknown(_) => {
-                    bail!("Unknown error");
+                    bail!("Unknown");
                 }
             }
         }
         None => {
             match lc.execute_default(&code_file)? {
                 ExecutionResult::Success(result) => {
-                    result.display();
+                    println!("{}", result);
                     // if !result.is_correct() {
                     //     println!(
                     //         "{}",
@@ -76,7 +78,7 @@ pub(crate) fn execute_testcases(
 
 pub(crate) fn submit(lc: &LeetCode<Authorized>, code_file: CodeFile) -> Result<()> {
     match lc.submit(&code_file)? {
-        SubmissionResult::Success(success) => success.display(),
+        SubmissionResult::Success(success) => println!("{}", success),
         SubmissionResult::LimitExceeded(wrong) => {
             bail!(wrong)
         }

@@ -1,3 +1,5 @@
+use std::{fmt, path::Path, str::FromStr};
+
 use colored::Colorize;
 use eyre::Result;
 use serde::{Deserialize, Serialize};
@@ -49,10 +51,24 @@ pub struct DailyChallengeQuestion {
     pub titleSlug: String,
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum Difficulty {
     Easy,
     Medium,
     Hard,
+}
+
+impl FromStr for Difficulty {
+    type Err = eyre::ErrReport;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        match s.to_lowercase().as_ref() {
+            "easy" => Ok(Difficulty::Easy),
+            "medium" => Ok(Difficulty::Medium),
+            "hard" => Ok(Difficulty::Hard),
+            _ => Err(eyre::eyre!("Unknown difficulty")),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -73,10 +89,9 @@ pub(crate) struct BoilerPlateCode {
 
 use super::super::file_parser::language::Language;
 impl BoilerPlateCode {
-    pub(crate) fn save_code(&self, filename: &str, title_slug: &str) -> Result<()> {
-        let language = Language::from_slug(&self.langSlug)
-            .ok_or_else(|| eyre::eyre!("Unable to identify language of code file!"))?;
-        let mut file = std::fs::File::create(filename)?;
+    pub(crate) fn save_code<P: AsRef<Path>>(&self, file_path: P, title_slug: &str) -> Result<()> {
+        let language = Language::from_str(&self.langSlug)?;
+        let mut file = std::fs::File::create(file_path)?;
         let comment = format!(
             " {} #LCEND https://leetcode.com/problems/{}/",
             language.inline_comment_start(),
@@ -90,22 +105,21 @@ impl BoilerPlateCode {
         Ok(())
     }
     pub(crate) fn is_supported(&self) -> bool {
-        Language::from_slug(&self.langSlug).is_some()
+        Language::from_str(&self.langSlug).is_ok()
     }
     pub(crate) fn extension(&self) -> Result<String> {
-        let language = Language::from_slug(&self.langSlug)
-            .ok_or_else(|| eyre::eyre!("Unable to identify language of code file!"))?;
+        let language = Language::from_str(&self.langSlug)?;
         Ok(language.extension().to_owned())
     }
 }
 
-impl std::fmt::Display for DailyChallenge {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for DailyChallenge {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "Title      : {}\nDifficulty : {}\nDate       : {}\nStatus     : {}\nAC Rate    : {:.2}%",
             self.question.title.bright_cyan(),
-            Difficulty::from_str(&self.question.difficulty),
+            Difficulty::from_str(&self.question.difficulty).map_err(|_| fmt::Error)?,
             self.date,
             self.userStatus,
             self.question.acRate
@@ -113,23 +127,12 @@ impl std::fmt::Display for DailyChallenge {
     }
 }
 
-impl std::fmt::Display for Difficulty {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Difficulty {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Difficulty::Easy => write!(f, "{}", "Easy".bright_green()),
             Difficulty::Medium => write!(f, "{}", "Medium".bright_yellow()),
             Difficulty::Hard => write!(f, "{}", "Hard".bright_red()),
-        }
-    }
-}
-
-impl Difficulty {
-    pub fn from_str(difficulty: &str) -> Difficulty {
-        match difficulty {
-            "Easy" => Difficulty::Easy,
-            "Medium" => Difficulty::Medium,
-            "Hard" => Difficulty::Hard,
-            _ => panic!("Invalid difficulty"),
         }
     }
 }

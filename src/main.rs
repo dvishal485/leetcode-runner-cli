@@ -27,7 +27,7 @@ fn main() -> Result<()> {
 
     match cli.command {
         Some(Commands::Auth) => match lc.get_metadata() {
-            Ok(metadata) => metadata.display(),
+            Ok(metadata) => println!("{}", metadata),
             Err(err) => bail!(err),
         },
         Some(Commands::DailyChallenge) => {
@@ -63,27 +63,24 @@ fn main() -> Result<()> {
             println!("Saved question as HTML to {}", filename.cyan());
             open::that(filename)?;
         }
-        Some(Commands::RunCustom {
-            testcases,
-            filename,
-        }) => {
-            _ = execute_testcases(filename, Some(testcases), &lc)?;
+        Some(Commands::RunCustom { testcases, file }) => {
+            _ = execute_testcases(file, Some(&testcases), &lc)?;
             // bail if `is_correct == false`?
         }
-        Some(Commands::Run { filename }) => {
-            _ = execute_testcases(filename, None, &lc)?;
+        Some(Commands::Run { file }) => {
+            _ = execute_testcases(file, None, &lc)?;
         }
-        Some(Commands::FastSubmit { filename }) => {
-            let code_file = if let Some(path) = filename {
+        Some(Commands::FastSubmit { file }) => {
+            let code_file = if let Some(path) = file {
                 CodeFile::from_file(&path)?
             } else {
-                CodeFile::from_dir()?
+                CodeFile::from_dir(".")?
             };
 
             submit(&lc, code_file)?;
         }
-        Some(Commands::Submit { filename }) => {
-            let (is_correct, code_file) = execute_testcases(filename, None, &lc)?;
+        Some(Commands::Submit { file }) => {
+            let (is_correct, code_file) = execute_testcases(file, None, &lc)?;
             if is_correct {
                 submit(&lc, code_file)?;
             } else {

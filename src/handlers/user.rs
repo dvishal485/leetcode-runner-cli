@@ -1,3 +1,5 @@
+use std::fmt;
+
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -9,14 +11,8 @@ pub struct UserMetadata {
     pub ac_hard: u16,
 }
 
-impl UserMetadata {
-    pub fn display(&self) {
-        println!("{}", self);
-    }
-}
-
-impl std::fmt::Display for UserMetadata {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for UserMetadata {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "{:18}:{:>15}\n{qs:18}:\n{empty:8}{easy:10}:{ec:>15}\n{empty:8}{med:10}:{mc:>15}\n{empty:8}{hard:10}:{hc:>15}",

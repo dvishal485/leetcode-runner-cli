@@ -1,4 +1,6 @@
-#[derive(Default, Clone, Copy)]
+use std::{fmt, str::FromStr};
+
+#[derive(Debug, Default, Clone, Copy)]
 pub enum Language {
     #[default]
     Rust,
@@ -20,75 +22,42 @@ pub enum Language {
     Elixir,
     Dart,
 }
+
+impl fmt::Display for Language {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&format!("{:?}", self).to_lowercase())
+    }
+}
+
+impl FromStr for Language {
+    type Err = eyre::ErrReport;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_ref() {
+            "rs" | "rust" => Ok(Language::Rust),
+            "py" | "python" | "python3" => Ok(Language::Python3),
+            "cpp" => Ok(Language::Cpp),
+            "java" => Ok(Language::Java),
+            "c" => Ok(Language::C),
+            "js" | "javascript" => Ok(Language::Javascript),
+            "go" | "golang" => Ok(Language::Go),
+            "kt" | "kotlin" => Ok(Language::Kotlin),
+            "swift" => Ok(Language::Swift),
+            "ts" | "typescript" => Ok(Language::Typescript),
+            "cs" | "csharp" => Ok(Language::Csharp),
+            "rb" | "ruby" => Ok(Language::Ruby),
+            "scala" => Ok(Language::Scala),
+            "php" => Ok(Language::PHP),
+            "rkt" | "racket" => Ok(Language::Racket),
+            "erl" | "erlang" => Ok(Language::Erlang),
+            "ex" | "elixer" => Ok(Language::Elixir),
+            "dart" => Ok(Language::Dart),
+            _ => Err(eyre::eyre!("Unknown language")),
+        }
+    }
+}
+
 impl Language {
-    pub fn from_str(input: &str) -> Option<Language> {
-        match input {
-            "rs" => Some(Language::Rust),
-            "py" => Some(Language::Python3),
-            "cpp" => Some(Language::Cpp),
-            "java" => Some(Language::Java),
-            "c" => Some(Language::C),
-            "js" => Some(Language::Javascript),
-            "go" => Some(Language::Go),
-            "kt" => Some(Language::Kotlin),
-            "swift" => Some(Language::Swift),
-            "ts" => Some(Language::Typescript),
-            "cs" => Some(Language::Csharp),
-            "rb" => Some(Language::Ruby),
-            "scala" => Some(Language::Scala),
-            "php" => Some(Language::PHP),
-            "rkt" => Some(Language::Racket),
-            "erl" => Some(Language::Erlang),
-            "ex" => Some(Language::Elixir),
-            "dart" => Some(Language::Dart),
-            _ => None,
-        }
-    }
-    pub fn to_str(&self) -> &str {
-        match self {
-            Language::Rust => "rust",
-            Language::Python3 => "python3",
-            Language::Cpp => "cpp",
-            Language::Java => "java",
-            Language::C => "c",
-            Language::Javascript => "javascript",
-            Language::Go => "golang",
-            Language::Kotlin => "kotlin",
-            Language::Swift => "swift",
-            Language::Typescript => "typescript",
-            Language::Csharp => "csharp",
-            Language::Ruby => "ruby",
-            Language::Scala => "scala",
-            Language::PHP => "php",
-            Language::Racket => "racket",
-            Language::Erlang => "erlang",
-            Language::Elixir => "elixir",
-            Language::Dart => "dart",
-        }
-    }
-    pub(crate) fn from_slug(input: &str) -> Option<Language> {
-        match input.to_lowercase().as_str() {
-            "rust" => Some(Language::Rust),
-            "python3" => Some(Language::Python3),
-            "cpp" => Some(Language::Cpp),
-            "java" => Some(Language::Java),
-            "c" => Some(Language::C),
-            "javascript" => Some(Language::Javascript),
-            "golang" => Some(Language::Go),
-            "kotlin" => Some(Language::Kotlin),
-            "swift" => Some(Language::Swift),
-            "typescript" => Some(Language::Typescript),
-            "csharp" => Some(Language::Csharp),
-            "ruby" => Some(Language::Ruby),
-            "scala" => Some(Language::Scala),
-            "php" => Some(Language::PHP),
-            "racket" => Some(Language::Racket),
-            "erlang" => Some(Language::Erlang),
-            "elixir" => Some(Language::Elixir),
-            "dart" => Some(Language::Dart),
-            _ => None,
-        }
-    }
     pub fn extension(&self) -> &str {
         match self {
             Language::Rust => "rs",
@@ -111,12 +80,7 @@ impl Language {
             Language::Dart => "dart",
         }
     }
-    pub fn to_string(&self) -> String {
-        self.to_str().to_string()
-    }
-}
 
-impl Language {
     pub(crate) fn inline_comment_start(&self) -> &str {
         use Language::*;
         match self {

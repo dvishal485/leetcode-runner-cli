@@ -1,3 +1,5 @@
+use std::fmt;
+
 use colored::Colorize;
 use serde::Deserialize;
 
@@ -67,8 +69,8 @@ pub struct LimitExceeded {
     pub state: String,
 }
 
-impl std::fmt::Display for LimitExceeded {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for LimitExceeded {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let seperator = "-------------------------------";
         write!(
             f,
@@ -81,8 +83,8 @@ impl std::fmt::Display for LimitExceeded {
     }
 }
 
-impl std::fmt::Display for CompileError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for CompileError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let seperator = "-------------------------------";
         write!(
             f,
@@ -95,8 +97,8 @@ impl std::fmt::Display for CompileError {
     }
 }
 
-impl std::fmt::Display for RuntimeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for RuntimeError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let seperator = "-------------------------------";
         write!(
             f,
@@ -114,8 +116,8 @@ impl std::fmt::Display for RuntimeError {
     }
 }
 
-impl std::fmt::Display for Success {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Success {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let seperator = "-------------------------------";
         let part1 = format!(
             "{}\n\n",
@@ -194,26 +196,5 @@ impl std::fmt::Display for Success {
 impl Success {
     pub fn is_correct(&self) -> bool {
         self.correct_answer
-    }
-    pub fn display(&self) {
-        println!("{}", self);
-    }
-}
-
-impl LimitExceeded {
-    pub fn display(&self) {
-        println!("{}", self);
-    }
-}
-
-impl CompileError {
-    pub fn display(&self) {
-        println!("{}", self);
-    }
-}
-
-impl RuntimeError {
-    pub fn display(&self) {
-        println!("{}", self);
     }
 }
