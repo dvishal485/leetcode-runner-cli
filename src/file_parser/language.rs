@@ -35,7 +35,9 @@ impl FromStr for Language {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_ref() {
             "rs" | "rust" => Ok(Language::Rust),
-            "py" | "python" | "python3" => Ok(Language::Python3),
+            /* python creates ambiguity with Python2.7 and Python3
+             * as both are supported by leetcode, so we only allow python3 */
+            "py" /*| "python" */ | "python3" => Ok(Language::Python3),
             "cpp" => Ok(Language::Cpp),
             "java" => Ok(Language::Java),
             "c" => Ok(Language::C),
