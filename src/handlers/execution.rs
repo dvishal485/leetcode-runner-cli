@@ -102,16 +102,15 @@ impl fmt::Display for RuntimeError {
         let seperator = "-------------------------------";
         write!(
             f,
-            "{}\nTestcase {} failed during execution!\n{}\n{}\n {}\n\n{}\n{}\n{}\n{}",
+            "{}\nTestcase {} failed during execution!\n{sep}\n{}\n{}\n\n{}\n{}\n{sep}\n{}",
             "Runtime Error!".red().bold(),
             format!("{}", self.std_output.len()).red(),
-            seperator.yellow(),
             "Error Message :".yellow(),
             self.runtime_error,
             "Full error message :".yellow(),
             self.full_runtime_error,
-            seperator.yellow(),
-            format!("{}\n{:?}", "Std Output :".yellow(), self.std_output)
+            format!("{}\n{:?}", "Std Output :".yellow(), self.std_output),
+            sep = seperator.yellow(),
         )
     }
 }
@@ -136,15 +135,13 @@ impl fmt::Display for Success {
         for i in 0..self.code_answer.len() {
             let is_correct = self.compare_result.chars().nth(i).unwrap_or('0') == '1';
             part2.push(format!(
-                "{1}\n{2}\n{3}\n{0:10}: {4:?}\n{7:10}: {5:?}\n\n{6}",
+                "{sep}\n{1}\n{sep}\n{0:10}: {2:?}\n{5:10}: {3:?}\n\n{4}",
                 "Output",
-                seperator.yellow(),
                 if is_correct {
                     format!("Testcase {} execution success", i + 1).green()
                 } else {
                     format!("Testcase {} execution failed", i + 1).red()
                 },
-                seperator.yellow(),
                 self.code_answer[i],
                 self.expected_code_answer[i],
                 if !self.std_output[i].is_empty() {
@@ -152,7 +149,8 @@ impl fmt::Display for Success {
                 } else {
                     String::new()
                 },
-                "Expected"
+                "Expected",
+                sep = seperator.yellow()
             ));
         }
 
@@ -176,7 +174,7 @@ impl fmt::Display for Success {
                     .italic()
                     .to_string()
             } else {
-                "".to_string()
+                String::new()
             },
         );
 
@@ -189,7 +187,18 @@ impl fmt::Display for Success {
                 .min(100),
             "Memory",
         );
-        write!(f, "{}{}{}{}", part1, part2.join(""), part3, part4)
+
+        let part5 = format!(
+            "{seperator}\n{:10}: {}",
+            "Status",
+            if self.is_correct() {
+                "Testcase execution success".green().italic()
+            } else {
+                "Testcase execution failed".yellow().italic()
+            },
+            seperator = seperator.yellow()
+        );
+        write!(f, "{}{}{}{}{}", part1, part2.join(""), part3, part4, part5)
     }
 }
 

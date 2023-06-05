@@ -48,12 +48,6 @@ pub(crate) fn execute_testcases<P: AsRef<Path>>(
             match lc.execute_default(&code_file)? {
                 ExecutionResult::Success(result) => {
                     println!("{}", result);
-                    // if !result.is_correct() {
-                    //     println!(
-                    //         "{}",
-                    //         "Testcases can be found in testcase.txt".yellow().italic()
-                    //     );
-                    // }
                     return Ok((result.is_correct(), code_file));
                 }
                 ExecutionResult::LimitExceeded(limit_exceeded) => {

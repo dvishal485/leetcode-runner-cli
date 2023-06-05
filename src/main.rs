@@ -32,7 +32,7 @@ fn main() -> Result<()> {
         },
         Some(Commands::DailyChallenge) => {
             let daily_challenge = lc.get_daily_challenge()?;
-            println!("Today's Daily Challenge: {}", daily_challenge);
+            println!("Today's Daily Challenge:\n{}", daily_challenge);
             let title = daily_challenge.question.titleSlug;
             let question = lc.question_content(&title)?;
 
