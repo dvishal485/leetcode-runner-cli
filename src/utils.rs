@@ -39,34 +39,34 @@ pub(crate) fn execute_testcases<P: AsRef<Path>>(
                 ExecutionResult::PendingResult(pending) => {
                     bail!(pending.state);
                 }
+                ExecutionResult::WrongTestcase(wrong_testcase) => bail!(wrong_testcase),
                 ExecutionResult::Unknown(_) => {
                     bail!("Unknown");
                 }
             }
         }
-        None => {
-            match lc.execute_default(&code_file)? {
-                ExecutionResult::Success(result) => {
-                    println!("{}", result);
-                    return Ok((result.is_correct(), code_file));
-                }
-                ExecutionResult::LimitExceeded(limit_exceeded) => {
-                    bail!(limit_exceeded);
-                }
-                ExecutionResult::CompileError(compile_error) => {
-                    bail!(compile_error);
-                }
-                ExecutionResult::RuntimeError(runtime_error) => {
-                    bail!(runtime_error);
-                }
-                ExecutionResult::PendingResult(pending) => {
-                    bail!(pending.state);
-                }
-                ExecutionResult::Unknown(_) => {
-                    bail!("Unknown error");
-                }
+        None => match lc.execute_default(&code_file)? {
+            ExecutionResult::Success(result) => {
+                println!("{}", result);
+                return Ok((result.is_correct(), code_file));
             }
-        }
+            ExecutionResult::LimitExceeded(limit_exceeded) => {
+                bail!(limit_exceeded);
+            }
+            ExecutionResult::CompileError(compile_error) => {
+                bail!(compile_error);
+            }
+            ExecutionResult::RuntimeError(runtime_error) => {
+                bail!(runtime_error);
+            }
+            ExecutionResult::PendingResult(pending) => {
+                bail!(pending.state);
+            }
+            ExecutionResult::WrongTestcase(wrong_testcase) => bail!(wrong_testcase),
+            ExecutionResult::Unknown(_) => {
+                bail!("Unknown error");
+            }
+        },
     }
 }
 

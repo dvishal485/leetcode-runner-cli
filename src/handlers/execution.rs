@@ -50,6 +50,12 @@ pub struct RuntimeError {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct WrongTestcase {
+    pub invalid_testcase: bool,
+    pub runtime_error: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct LimitExceeded {
     pub status_code: u8,
     pub lang: String,
@@ -69,6 +75,24 @@ pub struct LimitExceeded {
     pub state: String,
 }
 
+impl fmt::Display for WrongTestcase {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let seperator = "-------------------------------";
+        write!(
+            f,
+            "{}\n{}\n{}",
+            if self.invalid_testcase {
+                "Invalid Testcase!"
+            } else {
+                "Unknown Error!"
+            }
+            .red()
+            .bold(),
+            seperator.yellow(),
+            self.runtime_error
+        )
+    }
+}
 impl fmt::Display for LimitExceeded {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let seperator = "-------------------------------";

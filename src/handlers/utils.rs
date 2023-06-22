@@ -24,6 +24,7 @@ pub enum ExecutionResult {
     CompileError(CompileError),
     RuntimeError(RuntimeError),
     LimitExceeded(LimitExceeded),
+    WrongTestcase(WrongTestcase),
     PendingResult(PendingResult),
     Unknown(Unknown),
 }
