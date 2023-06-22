@@ -158,7 +158,7 @@ impl std::fmt::Display for SubmitLimitExceeded {
         write!(
             f,
             "\n{seperator}\n{}\n{seperator}\nStatus : {}\nTestcase {}/{} failed\n\nResult interpretation :\n{}\n",
-            "Submission Wrong!".red().bold(),
+            self.status_msg.red().bold(),
             self.status_msg,
              format!("{}",self.total_correct).green(),
               format!("{}",self.total_testcases).green(), 
@@ -172,8 +172,8 @@ impl std::fmt::Display for SubmitWrong {
         let seperator = "-------------------------------";
         write!(
             f,
-            "\n{seperator}\n{}\n{seperator}\nStatus : {}\nTestcase {}/{} failed\n\nTestcase failed :\n{}\n\nExpected Output :\n{}\nYour Output :\n{}\n",
-            "Submission Wrong!".red().bold(),
+            "{}\n{seperator}\nStatus : {}\nTestcase {}/{} failed\n\nTestcase failed :\n{}\n\nExpected Output :\n{}\nYour Output :\n{}\n",
+            self.status_msg .red().bold(),
             self.status_msg,
             format!("{}",self.total_correct).green(),
             format!("{}",self.total_testcases).green(),
