@@ -12,6 +12,7 @@ pub struct Success {
     pub memory: u64,
     pub code_answer: Vec<String>,
     pub code_output: Vec<String>,
+    #[serde(rename = "std_output_list")]
     pub std_output: Vec<String>,
     pub elapsed_time: u64,
     pub task_finish_time: u64,
@@ -22,6 +23,7 @@ pub struct Success {
     pub expected_memory: u64,
     pub expected_code_answer: Vec<String>,
     pub expected_code_output: Vec<String>,
+    #[serde(rename = "expected_std_output_list")]
     pub expected_std_output: Vec<String>,
     pub expected_elapsed_time: u64,
     pub expected_task_finish_time: u64,
@@ -39,6 +41,7 @@ pub struct Success {
 pub struct CompileError {
     pub compile_error: String,
     pub full_compile_error: String,
+    #[serde(rename = "std_output_list")]
     pub std_output: Vec<String>,
 }
 
@@ -46,6 +49,7 @@ pub struct CompileError {
 pub struct RuntimeError {
     pub runtime_error: String,
     pub full_runtime_error: String,
+    #[serde(rename = "std_output_list")]
     pub std_output: Vec<String>,
 }
 
@@ -64,6 +68,7 @@ pub struct LimitExceeded {
     pub memory: u64,
     pub code_answer: Vec<String>,
     pub code_output: Vec<String>,
+    #[serde(rename = "std_output_list")]
     pub std_output: Vec<String>,
     pub elapsed_time: u64,
     pub task_finish_time: u64,
