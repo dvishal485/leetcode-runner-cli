@@ -117,14 +117,19 @@ impl fmt::Display for DailyChallenge {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "{title_txt:12}: {}\n{diff:12}: {}\n{date:12}: {}\n{status:12}: {}\n{ac_rate:12}: {:.2}%",
+            "{title_txt:12}: {}\n{diff:12}: {}\n{date:12}: {}\n{status:12}: {}\n{ac_rate:12}: {:.2}%\n{link:12}: https://leetcode.com{}",
             self.question.title.bright_cyan(),
             Difficulty::from_str(&self.question.difficulty).map_err(|_| fmt::Error)?,
             self.date,
             self.userStatus,
-            self.question.acRate
-            , title_txt = "Title", diff = "Difficulty", ac_rate = "AC Rate",
-            date = "Date", status = "Status"
+            self.question.acRate,
+            self.link,
+            title_txt = "Title",
+            diff = "Difficulty",
+            ac_rate = "AC Rate",
+            date = "Date",
+            status = "Status",
+            link = "Link",
         )
     }
 }
