@@ -1,9 +1,9 @@
 use std::path::Path;
 
-use crate::GIT_README;
 use crate::file_parser::codefile::CodeFile;
 use crate::handlers::leetcode::{Authorized, LeetCode};
 use crate::handlers::utils::{ExecutionResult, SubmissionResult};
+use crate::GIT_README;
 
 use eyre::{bail, Result};
 
@@ -65,7 +65,7 @@ pub(crate) fn pack(lc: &LeetCode<Authorized>, file: Option<std::path::PathBuf>) 
     // create a directory if it doesn't exists with name of question
     // create a README.md file with the question description
     // create a file with the code
-    std::fs::create_dir_all(&code_file.question_title.replace(' ', ""))?;
+    std::fs::create_dir_all(&code_file.question_title)?;
 
     std::fs::write(
         format!(
@@ -88,7 +88,11 @@ pub(crate) fn pack(lc: &LeetCode<Authorized>, file: Option<std::path::PathBuf>) 
         );
         std::io::Write::write_all(
             &mut readme_file,
-            format!("# {}\n", code_file.question_title).as_bytes(),
+            format!(
+                "# {title}\n[Link to Problem](https://leetcode.com/problems/{title}/description)\n\n",
+                title = code_file.question_title
+            )
+            .as_bytes(),
         )?;
         std::io::Write::write_all(&mut readme_file, question.content.as_bytes())?;
     } else {
