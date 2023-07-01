@@ -104,31 +104,30 @@ pub(crate) fn pack(lc: &LeetCode<Authorized>, file: Option<std::path::PathBuf>) 
         .read(true)
         .write(true)
         .open(GIT_README)?;
+    let mut write_to_root = true;
     if root_readme_file.metadata()?.len() == 0 {
         std::io::Write::write_all(&mut root_readme_file, "# LeetCode Solutions\n\n".as_bytes())?;
-        std::io::Write::write_all(
-            &mut root_readme_file,
-            format!(
-                "- [{title}]({title}/main.{ex})\n",
-                ex = code_file.language.extension(),
-                title = code_file.question_title,
-            )
-            .as_bytes(),
-        )?;
     } else {
         let mut contents = String::new();
         std::io::Read::read_to_string(&mut root_readme_file, &mut contents)?;
-        if !contents.contains(&code_file.question_title) {
-            std::io::Write::write_all(
-                &mut root_readme_file,
-                format!(
-                    "- [{title}]({title}/main.{ex})\n",
-                    ex = code_file.language.extension(),
-                    title = code_file.question_title,
-                )
-                .as_bytes(),
-            )?;
+        if let Some(i) = contents.find(&code_file.question_title) {
+            if *contents
+                .as_bytes()
+                .get(i + code_file.question_title.len())
+                .unwrap_or(&b'-')
+                == b']'
+            {
+                // this is important as questions have variation
+                // like "frog-jump", "frog-jump-ii"
+                write_to_root = false
+            }
         }
+    }
+    if write_to_root {
+        std::io::Write::write_all(
+            &mut root_readme_file,
+            format!("- [{title}]({title}/)\n", title = code_file.question_title,).as_bytes(),
+        )?;
     }
     Ok(())
 }
