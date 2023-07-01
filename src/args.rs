@@ -52,6 +52,12 @@ pub enum Commands {
     /// Save today's daily challenge as HTML
     #[command(visible_alias = "-d")]
     DailyChallenge,
+    /// Packs the solution with the question into a directory
+    #[command(visible_alias = "-p")]
+    Pack {
+        /// File to pack
+        file: Option<PathBuf>,
+    },
 }
 
 #[derive(Subcommand)]

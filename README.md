@@ -55,6 +55,7 @@ leetcode-runner-cli [FLAGS] [OPTIONS <option>]
 | `-rt, run-custom`  | Execute file with custom testcases                  | [testcase_file] [file_to_run] |
 | `-s, submit`       | Submit solution to leetcode after passing testcases | [file_to_submit]              |
 | `-fs, fast-submit` | Submit solution to leetcode                         | [file_to_submit]              |
+| `-p, pack`         | Pack your solution and question in a directory      | [file_to_consider]            |
 
 ### File changes
 
@@ -104,19 +105,19 @@ fn main() {
 - Run src/main.rs with default testcases for question [koko-eating-bananas](https://leetcode.com/problems/koko-eating-bananas/)
 
     ```bash
-    leetcode-runner-cli -r ./src/main.rs
+    leetcode-runner-cli -r /src/main.rs
     ```
 
 - Run src/main.rs with custom testcase file
 
     ```bash
-    leetcode-runner-cli -rt ./testcase.txt ./src/main.rs
+    leetcode-runner-cli -rt testcase.txt /src/main.rs
     ```
 
 - Submit src/main.rs to leetcode
 
     ```bash
-    leetcode-runner-cli -s ./src/main.rs
+    leetcode-runner-cli -s /src/main.rs
     ```
 
     Note : This will first execute the default testcases and then submit the solution to leetcode only if the testcases pass as a preventive measure to avoid submitting wrong solution.
@@ -124,7 +125,13 @@ fn main() {
 - Submit src/main.rs to leetcode without running testcases
 
     ```bash
-    leetcode-runner-cli -fs ./src/main.rs
+    leetcode-runner-cli -fs /src/main.rs
+    ```
+
+- Pack your code and question into a directory to maintain your progress or upload on Git
+    
+    ```bash
+    leetcode-runner-cli -p /src/main.rs
     ```
 
 #### Note
@@ -139,6 +146,7 @@ So, in the above examples, you can simply do `cd ./src` and then run the followi
 - Execute with default testcases : `leetcode-runner-cli -r`
 - Submit : `leetcode-runner-cli -s`
 - Submit without running testcases : `leetcode-runner-cli -fs`
+- Pack code : `leetcode-runner-cli -p`
   
 ---
 

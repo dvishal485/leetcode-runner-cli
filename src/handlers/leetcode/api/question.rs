@@ -1,10 +1,12 @@
 use crate::handlers::leetcode::*;
 
+use colored::Colorize;
 use eyre::{bail, Context, Result};
+
+const GRAPHQL_URL: &str = "https://leetcode.com/graphql";
 
 impl LeetCode<Authorized> {
     pub fn get_daily_challenge(&self) -> Result<DailyChallenge> {
-        let url = "https://leetcode.com/graphql";
         let client = &self.client;
         let query = GraphqlRequest {
             query: r#"
@@ -38,7 +40,7 @@ impl LeetCode<Authorized> {
             variables: "{}".to_string(),
         };
 
-        let data = client.post(url).json(&query).send()?;
+        let data = client.post(GRAPHQL_URL).json(&query).send()?;
 
         // println!("{:?}", data.text());
         // todo!();
@@ -77,7 +79,6 @@ impl LeetCode<Authorized> {
 
     pub fn question_content(&self, title_slug: &str) -> Result<LeetcodeQuestion> {
         let client = &self.client;
-        let url = "https://leetcode.com/graphql";
         let query = GraphqlRequest {
             query: r#"
             query questionContent($titleSlug: String!) {
@@ -92,7 +93,7 @@ impl LeetCode<Authorized> {
             })?,
         };
 
-        let data = client.post(url).json(&query).send()?;
+        let data = client.post(GRAPHQL_URL).json(&query).send()?;
 
         #[derive(Deserialize)]
         struct QuestionWrapper {
@@ -103,29 +104,33 @@ impl LeetCode<Authorized> {
             data: QuestionWrapper,
         }
 
+        Ok(data.json::<Data>().map(|op| op.data.question)?)
+    }
+    pub fn save_boiler_code(&self, title_slug: &str) -> Result<()> {
+        let client = &self.client;
         let query = r#"
-        query questionEditorData($titleSlug: String!) {
-            question(titleSlug: $titleSlug) {
-                questionId
-                questionFrontendId
-                codeSnippets {
-                    lang
-                    langSlug
-                    code
+            query questionEditorData($titleSlug: String!) {
+                question(titleSlug: $titleSlug) {
+                    questionId
+                        questionFrontendId
+                        codeSnippets {
+                            lang
+                                langSlug
+                                code
+                        }
+                    envInfo
+                        enableRunCode
                 }
-                envInfo
-                enableRunCode
             }
-        }
         "#;
-        let varibales = serde_json::to_string(&Variables {
+        let variables = serde_json::to_string(&Variables {
             titleSlug: title_slug.to_string(),
         })?;
         let boiler_code = client
-            .post(url)
+            .post(GRAPHQL_URL)
             .json(&GraphqlRequest {
                 query: query.to_string(),
-                variables: varibales,
+                variables,
             })
             .send()?;
 
@@ -142,7 +147,6 @@ impl LeetCode<Authorized> {
         struct Wrapper {
             data: WrapperData,
         }
-
         let boiler_code_vector = boiler_code.json::<Wrapper>()?.data.question.codeSnippets;
 
         let mut boiler_code_vector = boiler_code_vector
@@ -150,19 +154,23 @@ impl LeetCode<Authorized> {
             .filter(|code| code.is_supported())
             .collect::<Vec<_>>();
 
-        // ask user to specify language among these options without using external lib
+        // ask user to specify language among these options
         let boiler_code = match boiler_code_vector.len() {
             0 => bail!("No boiler plate code available in supported language!"),
             1 => boiler_code_vector.swap_remove(0),
             _ => {
                 let mut input = String::new();
-                println!("\nPlease select a language from the following options :");
+                println!(
+                    "{}",
+                    "\nPlease select a language from the following options :".yellow()
+                );
                 for (i, code) in boiler_code_vector.iter().enumerate() {
                     println!("{}: {}", i, code.langSlug);
                 }
                 println!(
                     "\nFor example : Input \"{}\" for {}",
-                    0, &boiler_code_vector[0].langSlug
+                    "0".cyan(),
+                    &boiler_code_vector[0].langSlug.cyan()
                 );
                 std::io::stdin().read_line(&mut input)?;
                 let input = input.trim().parse::<usize>()?;
@@ -180,13 +188,11 @@ impl LeetCode<Authorized> {
             input.to_string()
         };
         boiler_code.save_code(&filename, &title_slug)?;
-
-        Ok(data.json::<Data>().map(|op| op.data.question)?)
+        Ok(())
     }
 
     pub fn question_metadata(&self, title_slug: &str) -> Result<Question> {
         let client = &self.client;
-        let url = "https://leetcode.com/graphql";
 
         let query = GraphqlRequest {
             query: r#"
@@ -210,7 +216,7 @@ impl LeetCode<Authorized> {
             })?,
         };
         let data = client
-            .post(url)
+            .post(GRAPHQL_URL)
             .json(&query)
             .send()
             .wrap_err("Failed to fetch question id from LeetCode")?;

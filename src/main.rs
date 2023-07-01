@@ -14,6 +14,7 @@ mod handlers;
 mod utils;
 
 const LC_COOKIE_ENV_KEY: &str = "LC_COOKIE";
+const GIT_README: &str = "README.md";
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -35,6 +36,7 @@ fn main() -> Result<()> {
             println!("Today's Daily Challenge:\n{}", daily_challenge);
             let title = daily_challenge.question.titleSlug;
             let question = lc.question_content(&title)?;
+            lc.save_boiler_code(&title)?;
 
             let filename = "daily_challenge.html";
             std::fs::write(filename, question.content)?;
@@ -56,6 +58,7 @@ fn main() -> Result<()> {
                 &question_name
             };
             let question = lc.question_content(question_name)?;
+            lc.save_boiler_code(question_name)?;
             let filename = format!("{}.html", question_name);
 
             // save to filename
@@ -86,6 +89,47 @@ fn main() -> Result<()> {
             } else {
                 bail!("Aborting submission due to failed testcase(s)".red().bold());
             }
+        }
+        Some(Commands::Pack { file }) => {
+            let code_file = if let Some(path) = file {
+                CodeFile::from_file(&path)?
+            } else {
+                CodeFile::from_dir(".")?
+            };
+            let question = lc.question_content(&code_file.question_title)?;
+
+            // create a directory if it doesn't exists with name of question
+            // create a README.md file with the question description
+            // create a file with the code
+            std::fs::create_dir_all(&code_file.question_title.replace(' ', ""))?;
+
+            std::fs::write(
+                format!(
+                    "{}/main.{}",
+                    &code_file.question_title,
+                    code_file.language.extension()
+                ),
+                code_file.code,
+            )?;
+
+            // dont create readme if it exists
+            if let Ok(mut readme_file) = std::fs::OpenOptions::new()
+                .create_new(true)
+                .write(true)
+                .open(format!("{}/{}", &code_file.question_title, GIT_README))
+            {
+                println!(
+                    "You can write your notes about question in {}/README.md",
+                    &code_file.question_title
+                );
+                std::io::Write::write_all(
+                    &mut readme_file,
+                    format!("# {}\n", code_file.question_title).as_bytes(),
+                )?;
+                std::io::Write::write_all(&mut readme_file, question.content.as_bytes())?;
+            } else {
+                println!("{} already exists, skipping creation.", GIT_README);
+            };
         }
         None => {}
     };
