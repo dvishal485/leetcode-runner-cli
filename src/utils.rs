@@ -10,7 +10,7 @@ use eyre::{bail, Result};
 /// The first element of the return tuple indicates whether the answer is correct.
 pub(crate) fn execute_testcases<P: AsRef<Path>>(
     file_path: Option<P>,
-    testcases: Option<&str>,
+    testcases: Option<String>,
     lc: &LeetCode<Authorized>,
 ) -> Result<(bool, CodeFile)> {
     let code_file = if let Some(path) = file_path {
@@ -48,7 +48,7 @@ pub(crate) fn submit(lc: &LeetCode<Authorized>, code_file: CodeFile) -> Result<(
         SubmissionResult::CompileError(compile_err) => bail!(compile_err),
         SubmissionResult::RuntimeError(runtime_error) => bail!(runtime_error),
         SubmissionResult::Wrong(wrong) => bail!(wrong),
-        SubmissionResult::Unknown(_) => bail!("Unknown error"),
+        SubmissionResult::Unknown(_) => bail!("Unknown error occured"),
     };
 
     Ok(())

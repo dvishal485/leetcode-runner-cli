@@ -16,19 +16,14 @@ pub enum Commands {
     #[command(visible_alias = "-a")]
     Auth,
     /// Executes code with testcases
-    #[command(visible_alias = "-rt")]
-    RunCustom {
-        /// Testcases to run
-        testcases: String,
-        #[arg(short, long)]
-        /// File to execute
-        file: Option<PathBuf>,
-    },
     #[command(visible_alias = "-r")]
     Run {
         #[arg(short, long)]
-        /// File to execute with default testcases
+        /// File to execute
         file: Option<PathBuf>,
+        #[arg(short, long)]
+        /// Testcases to run
+        testcase_file: Option<String>,
     },
     /// Submits code to LeetCode
     #[command(visible_alias = "-fs")]
@@ -42,6 +37,9 @@ pub enum Commands {
         #[arg(short, long)]
         /// File to submit
         file: Option<PathBuf>,
+        #[arg(short, long)]
+        /// Testcases to run
+        testcase_file: Option<String>,
     },
     /// Save a question as HTML
     #[command(visible_alias = "-q")]
@@ -58,18 +56,5 @@ pub enum Commands {
         #[arg(short, long)]
         /// File to pack
         file: Option<PathBuf>,
-    },
-}
-
-#[derive(Subcommand)]
-pub enum Execute {
-    #[command(visible_alias = "-t")]
-    Testcases {
-        #[arg(short, long)]
-        /// File to run
-        file: Option<PathBuf>,
-        #[arg(short, long)]
-        /// Testcases to run
-        testcases: Option<String>,
     },
 }

@@ -66,12 +66,8 @@ fn main() -> Result<()> {
             println!("Saved question as HTML to {}", filename.cyan());
             open::that(filename)?;
         }
-        Some(Commands::RunCustom { testcases, file }) => {
-            _ = execute_testcases(file, Some(&testcases), &lc)?;
-            // bail if `is_correct == false`?
-        }
-        Some(Commands::Run { file }) => {
-            _ = execute_testcases(file, None, &lc)?;
+        Some(Commands::Run { file, testcase_file: testcases }) => {
+            execute_testcases(file, testcases, &lc)?;
         }
         Some(Commands::FastSubmit { file }) => {
             let code_file = if let Some(path) = file {
@@ -82,8 +78,8 @@ fn main() -> Result<()> {
 
             submit(&lc, code_file)?;
         }
-        Some(Commands::Submit { file }) => {
-            let (is_correct, code_file) = execute_testcases(file, None, &lc)?;
+        Some(Commands::Submit { file, testcase_file: testcases }) => {
+            let (is_correct, code_file) = execute_testcases(file, testcases, &lc)?;
             if is_correct {
                 submit(&lc, code_file)?;
             } else {
