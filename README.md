@@ -2,6 +2,10 @@
 
 Executes leetcode testcases and submits your solution through CLI interface
 
+![Crates.io](https://img.shields.io/crates/v/leetcode-runner-cli)
+[![GitHub license](https://img.shields.io/github/license/dvishal485/leetcode-runner-cli)](./LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/dvishal485/leetcode-runner-cli)](./issues)
+
 ![Leetcode Runner CLI Banner](cli-banner.png)
 
 **Disclaimer :** This is not an official Leetcode tool. I am not affiliated with Leetcode in any way. This tool is not endorsed by leetcode.
@@ -9,6 +13,14 @@ Executes leetcode testcases and submits your solution through CLI interface
 ---
 
 ## Installation
+
+### Using Cargo
+
+1. If you have [Cargo installed](https://doc.rust-lang.org/cargo/getting-started/installation.html) on your system then you can install the tool using the following command.
+
+    ```bash
+    cargo install leetcode-runner-cli
+    ```
 
 ### Using pre-built binaries
 
@@ -44,7 +56,7 @@ Depending on your platform you may need to install certain tools to be able to c
 
 ## Usage
 
-1. Setup environment variable `LC_COOKIE` with your leetcode session cookie.
+1. Setup environment variable `LC_COOKIE` with your leetcode session cookie. You may search on internet to know how to setup an environment variable on your system.
 
    You can get your session cookie by logging in to leetcode and inspecting the cookie from Request headers in your browser's developer tools.
 
@@ -54,7 +66,7 @@ Depending on your platform you may need to install certain tools to be able to c
     export LC_COOKIE="csrftoken=abcdefgh;LEETCODE_SESSION=ijklmnopqrstuvwxyz;"
     ```
 
-1. Execute the tool and verify your authentication.
+2. Execute the tool and verify your authentication.
 
     ```bash
     leetcode-runner-cli -a

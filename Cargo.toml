@@ -1,6 +1,6 @@
 [package]
 name = "leetcode-runner-cli"
-version = "0.2.6"
+version = "0.2.7"
 edition = "2021"
 authors = ["Vishal Das"]
 description = "A tool to execute and submit leetcode problems from the command line"
