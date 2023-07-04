@@ -3,8 +3,8 @@
 Executes leetcode testcases and submits your solution through CLI interface
 
 ![Crates.io](https://img.shields.io/crates/v/leetcode-runner-cli)
-[![GitHub license](https://img.shields.io/github/license/dvishal485/leetcode-runner-cli)](./LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/dvishal485/leetcode-runner-cli)](./issues)
+[![GitHub license](https://img.shields.io/github/license/dvishal485/leetcode-runner-cli)](/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/dvishal485/leetcode-runner-cli)](https://github.com/dvishal485/leetcode-runner-cli/issues)
 
 ![Leetcode Runner CLI Banner](cli-banner.png)
 
@@ -24,9 +24,9 @@ Executes leetcode testcases and submits your solution through CLI interface
 
 ### Using pre-built binaries
 
-1. Go to the [Releases section](/releases) and download the appropriate binary for your system.
+1. Go to the [Releases section](https://github.com/dvishal485/leetcode-runner-cli/releases) and download the appropriate binary for your system.
 
-1. Place the binary in appropriate location and add the location in your PATH environment variable.
+2. Place the binary in appropriate location and add the location in your PATH environment variable.
 
 ### Building from source
 
@@ -74,11 +74,11 @@ Depending on your platform you may need to install certain tools to be able to c
 
 ---
 
+### Commands
+
 ```bash
 leetcode-runner-cli [COMMAND] [OPTIONS <option>]
 ```
-
-### Commands
 
 | Commands           | Description                                    | Arguments                    |
 | :----------------- | :--------------------------------------------- | :--------------------------- |
