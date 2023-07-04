@@ -2,7 +2,7 @@
 
 Executes leetcode testcases and submits your solution through CLI interface
 
-![Crates.io](https://img.shields.io/crates/v/leetcode-runner-cli)
+[![Crates.io](https://img.shields.io/crates/v/leetcode-runner-cli)](https://crates.io/crates/leetcode-runner-cli/)
 [![GitHub license](https://img.shields.io/github/license/dvishal485/leetcode-runner-cli)](/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/dvishal485/leetcode-runner-cli)](https://github.com/dvishal485/leetcode-runner-cli/issues)
 
