@@ -2,6 +2,13 @@
 name = "leetcode-runner-cli"
 version = "0.2.6"
 edition = "2021"
+authors = ["Vishal Das"]
+description = "A tool to execute and submit leetcode problems from the command line"
+readme = "README.md"
+repository = "https://github.com/dvishal485/leetcode-runner-cli"
+license = "Apache-2.0"
+keywords = ["leetcode", "leetcode-cli", "leetcode-questions"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 clap = { version = "4.3.1", features = ["derive"] }
