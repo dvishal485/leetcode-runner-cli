@@ -2,6 +2,8 @@
 
 Executes leetcode testcases and submits your solution through CLI interface
 
+![Leetcode Runner CLI Banner](cli-banner.png)
+
 **Disclaimer :** This is not an official Leetcode tool. I am not affiliated with Leetcode in any way. This tool is not endorsed by leetcode.
 
 ---
@@ -31,11 +33,12 @@ Executes leetcode testcases and submits your solution through CLI interface
     cargo install --path .
     ```
 
-#### Note
+#### Platform Specific Instructions
 
 Depending on your platform you may need to install certain tools to be able to compile successfully.
 
-For example: On Ubuntu system, you may need to execute `apt-get install pkg-config openssl-dev -y` to be able to compile the program successfully.
+- On Ubuntu system, you may need to execute `apt-get install pkg-config openssl-dev -y` to be able to compile the program successfully.
+- Windows user are good to go.
 
 ---
 
@@ -43,7 +46,7 @@ For example: On Ubuntu system, you may need to execute `apt-get install pkg-conf
 
 1. Setup environment variable `LC_COOKIE` with your leetcode session cookie.
 
-   You can get your session cookie by logging in to leetcode and inspecting the cookie in your browser's developer tools.
+   You can get your session cookie by logging in to leetcode and inspecting the cookie from Request headers in your browser's developer tools.
 
    Make sure to put your cookie in double quotes.
 
@@ -59,25 +62,25 @@ For example: On Ubuntu system, you may need to execute `apt-get install pkg-conf
 
 ---
 
-
 ```bash
 leetcode-runner-cli [COMMAND] [OPTIONS <option>]
 ```
 
 ### Commands
 
-| Commands           | Description                                         | Arguments                       |
-| :----------------- | :-------------------------------------------------- | :------------------------------ |
-| `-h, --help`       | Prints help information                             | -                               |
-| `-V, --version`    | Prints version information                          | -                               |
-| `-a, auth`         | Authenticate with leetcode                          | -                               |
-| `-d, daily`        | Fetch daily challenge question                      | -                               |
-| `-q, question`     | Question title / url to fetch                       | <QUESTION_NAME>                 |
-| `-r, run`          | Execute file with default testcases                 | -f <FILE> (optional)            |
-| `-rt, run-custom`  | Execute file with custom testcases                  | -f <FILE> (optional) <TESTCASE> |
-| `-s, submit`       | Submit solution to leetcode after passing testcases | -f <FILE> (optional)            |
-| `-fs, fast-submit` | Submit solution to leetcode                         | -f <FILE> (optional)            |
-| `-p, pack`         | Pack your solution and question in a directory      | -f <FILE> (optional)            |
+| Commands           | Description                                    | Arguments                    |
+| :----------------- | :--------------------------------------------- | :--------------------------- |
+| `-h, --help`       | Prints help information                        | -                            |
+| `-V, --version`    | Prints version information                     | -                            |
+| `-a, auth`         | Authenticate with leetcode                     | -                            |
+| `-d, daily`        | Fetch daily challenge question                 | -                            |
+| `-q, question`     | Question title / url to fetch                  | [QUESTION_NAME] (required)   |
+| `-r, run`          | Execute file with default/specified testcases  | -f [FILE] -t [TESTCASE_FILE] |
+| `-s, submit`       | Submit solution after passing testcases        | -f [FILE]                    |
+| `-fs, fast-submit` | Submit solution without checking for testcase  | -f [FILE]                    |
+| `-p, pack`         | Pack your solution and question in a directory | -f [FILE]                    |
+
+You can always look into a commands usage by passing `--help`.
 
 ### File changes
 
@@ -112,6 +115,8 @@ fn main() {
 
 ### Example usage
 
+The file name need not to be specified explicitly with `--file` or `-f` as it is an optional field. [Check out Note below for more information](#note)
+
 - Fetch question [koko-eating-bananas](https://leetcode.com/problems/koko-eating-bananas/)
 
     ```bash
@@ -127,33 +132,33 @@ fn main() {
 - Run src/main.rs with default testcases for question [koko-eating-bananas](https://leetcode.com/problems/koko-eating-bananas/)
 
     ```bash
-    leetcode-runner-cli -r /src/main.rs
+    leetcode-runner-cli -r --file /src/main.rs
     ```
 
 - Run src/main.rs with custom testcase file
 
     ```bash
-    leetcode-runner-cli -rt testcase.txt /src/main.rs
+    leetcode-runner-cli -r -t testcase.txt --file /src/main.rs
     ```
 
 - Submit src/main.rs to leetcode
 
     ```bash
-    leetcode-runner-cli -s /src/main.rs
+    leetcode-runner-cli -s --file /src/main.rs
     ```
 
-    Note : This will first execute the default testcases and then submit the solution to leetcode only if the testcases pass as a preventive measure to avoid submitting wrong solution.
+    Note : This will first execute the default testcases (or the specified testcases if given) and then submit the solution to leetcode only if the testcases pass as a preventive measure to avoid submitting wrong solution.
 
 - Submit src/main.rs to leetcode without running testcases
 
     ```bash
-    leetcode-runner-cli -fs /src/main.rs
+    leetcode-runner-cli -fs -f /src/main.rs
     ```
 
 - Pack your code and question into a directory to maintain your progress or upload on Git
-    
+
     ```bash
-    leetcode-runner-cli -p /src/main.rs
+    leetcode-runner-cli -p --file /src/main.rs
     ```
 
 #### Note
@@ -164,7 +169,7 @@ fn main() {
 
 So, in the above examples, you can simply do `cd ./src` and then run the following commands :
 
-- Execute with custom testcases : `leetcode-runner-cli -rt ./testcase.txt`
+- Execute with custom testcases : `leetcode-runner-cli -r -t testcase.txt`
 - Execute with default testcases : `leetcode-runner-cli -r`
 - Submit : `leetcode-runner-cli -s`
 - Submit without running testcases : `leetcode-runner-cli -fs`
@@ -188,4 +193,4 @@ More languages can be added manually as per requirement by [changing enum](https
 - This Project is [Apache-2.0](./LICENSE) Licensed
 - Copyright 2023 [Vishal Das](https://github.com/dvishal485)
 
---
+---
