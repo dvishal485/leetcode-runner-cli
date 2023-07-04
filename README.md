@@ -8,15 +8,38 @@ Executes leetcode testcases and submits your solution through CLI interface
 
 ## Installation
 
+### Using pre-built binaries
+
+1. Go to the [Releases section](/releases) and download the appropriate binary for your system.
+
+1. Place the binary in appropriate location and add the location in your PATH environment variable.
+
+### Building from source
+
 1. Install [rust from here](https://www.rust-lang.org/tools/install) to compile the source code.
 
-1. Clone the repository and install the binary.
+1. Clone the repository and move to the repository directory.
 
     ```bash
     git clone https://github.com/dvishal485/leetcode-runner-cli.git
     cd leetcode-runner-cli
+    ```
+
+1. Compile and install the binary.
+
+    ```bash
     cargo install --path .
     ```
+
+#### Note
+
+Depending on your platform you may need to install certain tools to be able to compile successfully.
+
+For example: On Ubuntu system, you may need to execute `apt-get install pkg-config openssl-dev -y` to be able to compile the program successfully.
+
+---
+
+## Usage
 
 1. Setup environment variable `LC_COOKIE` with your leetcode session cookie.
 
@@ -36,26 +59,25 @@ Executes leetcode testcases and submits your solution through CLI interface
 
 ---
 
-## Usage
 
 ```bash
-leetcode-runner-cli [FLAGS] [OPTIONS <option>]
+leetcode-runner-cli [COMMAND] [OPTIONS <option>]
 ```
 
 ### Commands
 
-| Commands           | Description                                         | Arguments                     |
-| :----------------- | :-------------------------------------------------- | :---------------------------- |
-| `-h, --help`       | Prints help information                             | -                             |
-| `-V, --version`    | Prints version information                          | -                             |
-| `-a, auth`         | Authenticate with leetcode                          | -                             |
-| `-d, daily`        | Fetch daily challenge question                      | -                             |
-| `-q, question`     | Question title / url to fetch                       | [question_title]              |
-| `-r, run`          | Execute file with default testcases                 | [file_to_run]                 |
-| `-rt, run-custom`  | Execute file with custom testcases                  | [testcase_file] [file_to_run] |
-| `-s, submit`       | Submit solution to leetcode after passing testcases | [file_to_submit]              |
-| `-fs, fast-submit` | Submit solution to leetcode                         | [file_to_submit]              |
-| `-p, pack`         | Pack your solution and question in a directory      | [file_to_consider]            |
+| Commands           | Description                                         | Arguments                       |
+| :----------------- | :-------------------------------------------------- | :------------------------------ |
+| `-h, --help`       | Prints help information                             | -                               |
+| `-V, --version`    | Prints version information                          | -                               |
+| `-a, auth`         | Authenticate with leetcode                          | -                               |
+| `-d, daily`        | Fetch daily challenge question                      | -                               |
+| `-q, question`     | Question title / url to fetch                       | <QUESTION_NAME>                 |
+| `-r, run`          | Execute file with default testcases                 | -f <FILE> (optional)            |
+| `-rt, run-custom`  | Execute file with custom testcases                  | -f <FILE> (optional) <TESTCASE> |
+| `-s, submit`       | Submit solution to leetcode after passing testcases | -f <FILE> (optional)            |
+| `-fs, fast-submit` | Submit solution to leetcode                         | -f <FILE> (optional)            |
+| `-p, pack`         | Pack your solution and question in a directory      | -f <FILE> (optional)            |
 
 ### File changes
 
@@ -166,4 +188,4 @@ More languages can be added manually as per requirement by [changing enum](https
 - This Project is [Apache-2.0](./LICENSE) Licensed
 - Copyright 2023 [Vishal Das](https://github.com/dvishal485)
 
----
+--

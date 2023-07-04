@@ -55,6 +55,7 @@ pub enum Commands {
     /// Packs the solution with the question into a directory
     #[command(visible_alias = "-p")]
     Pack {
+        #[arg(short, long)]
         /// File to pack
         file: Option<PathBuf>,
     },
