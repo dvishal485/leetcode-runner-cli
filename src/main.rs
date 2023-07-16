@@ -15,6 +15,7 @@ mod utils;
 
 const LC_COOKIE_ENV_KEY: &str = "LC_COOKIE";
 const GIT_README: &str = "README.md";
+const DAILY_CHALLENGE: &str = "daily_challenge.html";
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -31,19 +32,23 @@ fn main() -> Result<()> {
             Ok(metadata) => println!("{}", metadata),
             Err(err) => bail!(err),
         },
-        Some(Commands::DailyChallenge) => {
+        Some(Commands::DailyChallenge { no_code_save }) => {
             let daily_challenge = lc.get_daily_challenge()?;
             println!("Today's Daily Challenge:\n{}", daily_challenge);
             let title = daily_challenge.question.titleSlug;
-            let question = lc.question_content(&title)?;
-            lc.save_boiler_code(&title)?;
+            if !no_code_save {
+                lc.save_boiler_code(&title)?;
+            }
 
-            let filename = "daily_challenge.html";
-            std::fs::write(filename, question.content)?;
-            println!("Saved question as HTML to {}", filename.cyan());
-            open::that(filename)?;
+            let question = lc.question_content(&title)?;
+            std::fs::write(DAILY_CHALLENGE, question.content)?;
+            println!("Saved question as HTML to {}", DAILY_CHALLENGE.cyan());
+            open::that(DAILY_CHALLENGE)?;
         }
-        Some(Commands::Question { question_name }) => {
+        Some(Commands::Question {
+            question_name,
+            no_code_save,
+        }) => {
             let question_name = if let Some(idx) = question_name.find("leetcode.com/problems/") {
                 let question_title = question_name[idx..]
                     .split_whitespace()
@@ -57,16 +62,21 @@ fn main() -> Result<()> {
             } else {
                 &question_name
             };
-            let question = lc.question_content(question_name)?;
-            lc.save_boiler_code(question_name)?;
-            let filename = format!("{}.html", question_name);
+            if !no_code_save {
+                lc.save_boiler_code(question_name)?;
+            }
 
+            let question = lc.question_content(question_name)?;
+            let filename = format!("{}.html", question_name);
             // save to filename
             std::fs::write(&filename, question.content)?;
             println!("Saved question as HTML to {}", filename.cyan());
             open::that(filename)?;
         }
-        Some(Commands::Run { file, testcase_file: testcases }) => {
+        Some(Commands::Run {
+            file,
+            testcase_file: testcases,
+        }) => {
             execute_testcases(file, testcases, &lc)?;
         }
         Some(Commands::FastSubmit { file }) => {
@@ -78,7 +88,10 @@ fn main() -> Result<()> {
 
             submit(&lc, code_file)?;
         }
-        Some(Commands::Submit { file, testcase_file: testcases }) => {
+        Some(Commands::Submit {
+            file,
+            testcase_file: testcases,
+        }) => {
             let (is_correct, code_file) = execute_testcases(file, testcases, &lc)?;
             if is_correct {
                 submit(&lc, code_file)?;

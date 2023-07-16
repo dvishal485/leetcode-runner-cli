@@ -46,10 +46,17 @@ pub enum Commands {
     Question {
         /// Question name
         question_name: String,
+        /// Flag to not save the boilerplate code
+        #[arg(short, long)]
+        no_code_save: bool,
     },
     /// Save today's daily challenge as HTML
     #[command(visible_alias = "-d")]
-    DailyChallenge,
+    DailyChallenge {
+        /// Flag to not save the boilerplate code
+        #[arg(short, long)]
+        no_code_save: bool,
+    },
     /// Packs the solution with the question into a directory
     #[command(visible_alias = "-p")]
     Pack {

@@ -1,0 +1,5 @@
+[target.x86_64-unknown-linux-musl]
+pre-build = [
+    "apt-get update && apt-get install apt-utils libssl-dev -y",
+    "cd /usr/include/openssl && ln -s /usr/include/x86_64-linux-gnu/openssl/opensslconf.h opensslconf.h"
+]
